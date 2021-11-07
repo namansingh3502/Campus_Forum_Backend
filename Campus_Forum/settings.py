@@ -92,6 +92,26 @@ DATABASES = {
     }
 }
 
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'Forum': {
+        'ENGINE': 'djongo',
+        'NAME': 'FORUM',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': 'mongodb+srv://namansingh:msi2020@cluster0.vsnj4.mongodb.net/test?authSource=admin&replicaSet=atlas-9r9h9b-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true'
+        }
+    }
+}
+"""
+
+
+# Django-Rest framework config
+
 REST_FRAMEWORK ={
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
@@ -152,3 +172,9 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:1234",
     "http://127.0.0.1:3000",
 ]
+
+# Path to db routers
+#DATABASE_ROUTERS = [ BASE_DIR / 'routers/db_routers.py' ]
+
+# Path tlo media root
+MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')

@@ -30,8 +30,10 @@ class UserProfile(models.Model):
     phone = models.CharField(max_length=15, blank=True)
     email = models.EmailField(max_length=30, blank=True)
 
+    user_image = models.ImageField(upload_to='user_images', null=True)
+
     def __str__(self):
-        return self.first_name + self.last_name
+        return self.first_name + " " + self.last_name
 
 @receiver(post_save, sender=User)
 def createUserProfile(sender,instance,created,**kwargs):
