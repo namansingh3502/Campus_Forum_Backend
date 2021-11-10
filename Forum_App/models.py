@@ -15,21 +15,30 @@ class Post_Detail(models.Model):
         on_delete=models.CASCADE
     )
     time = models.DateTimeField(
+        "Post-Time",
         auto_now=True
     )
     body = models.CharField(
+        "Post-Text",
         max_length=200,
         blank=True,
         null=True
     )
     image_count = models.PositiveIntegerField(
+        "Number of images attached to post",
         default=0,
+        null=False,
+        blank=False
+    )
+    is_active = models.BooleanField(
+        "Is_Active",
+        default=True,
         null=False,
         blank=False
     )
 
     def __str__(self):
-        return self.user.user_id + " " + str(self.time)
+        return self.user.user_id + " " + str(self.time) + " " + self.is_active
 
 class Post_Image_Store(models.Model):
     """
@@ -72,7 +81,7 @@ class Post_Image(models.Model):
     def __str__(self):
         return self.post + " " + self.image
 
-class Post_Likes(models.Model):
+class Post_Like(models.Model):
     """
     Handles details of likes on each post by users
     """
@@ -91,14 +100,14 @@ class Post_Likes(models.Model):
     def __str__(self):
         return self.post.id + " " + self.user
 
-class Post_Comments(models.Model):
+class Post_Comment(models.Model):
     """
     Handles details of Comment
     which user commented on which post and when and what
     """
 
     post = models.ForeignKey(
-        "Post_Comments",
+        "Post_Detail",
         on_delete=models.CASCADE,
         related_name="Post_Comment"
     )
@@ -112,6 +121,11 @@ class Post_Comments(models.Model):
     )
     body = models.TextField(
         max_length=100,
+        null=False,
+        blank=False
+    )
+    is_active = models.BooleanField(
+        default=True,
         null=False,
         blank=False
     )
