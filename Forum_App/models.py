@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Create your models here.
 
-class Post_Detail(models.Model):
+class PostDetail(models.Model):
     """
     necessary information related to posts i.e.
     who created , when created and body/text of post
@@ -38,9 +38,9 @@ class Post_Detail(models.Model):
     )
 
     def __str__(self):
-        return self.user.user_id + " " + str(self.time) + " " + self.is_active
+        return self.user.user_id + " " + str(self.time) + " " + str(self.is_active)
 
-class Post_Image_Store(models.Model):
+class PostImageStore(models.Model):
     """
     images uploaded in posts are stored here
     """
@@ -62,18 +62,18 @@ class Post_Image_Store(models.Model):
     def __str__(self):
         return self.image
 
-class Post_Image(models.Model):
+class PostImage(models.Model):
     """
     Relation of post and images is stored here
     """
 
     post = models.ForeignKey(
-        "Post_Detail",
+        "PostDetail",
         on_delete=models.CASCADE,
         related_name="Post_Id"
     )
     image = models.ForeignKey(
-        "Post_Image_Store",
+        "PostImageStore",
         on_delete=models.CASCADE,
         related_name="Post_Image_details"
     )
@@ -81,13 +81,13 @@ class Post_Image(models.Model):
     def __str__(self):
         return self.post + " " + self.image
 
-class Post_Like(models.Model):
+class PostLike(models.Model):
     """
     Handles details of likes on each post by users
     """
 
     post = models.ForeignKey(
-        "Post_Detail",
+        "PostDetail",
         on_delete=models.CASCADE,
         related_name="Post_Like"
     )
@@ -100,14 +100,14 @@ class Post_Like(models.Model):
     def __str__(self):
         return self.post.id + " " + self.user
 
-class Post_Comment(models.Model):
+class PostComment(models.Model):
     """
     Handles details of Comment
     which user commented on which post and when and what
     """
 
     post = models.ForeignKey(
-        "Post_Detail",
+        "PostDetail",
         on_delete=models.CASCADE,
         related_name="Post_Comment"
     )
@@ -132,3 +132,25 @@ class Post_Comment(models.Model):
 
     def __str__(self):
         return self.post + " " + self.user + " " + self.datetime
+
+class ChannelDetail(models.Model):
+
+    channel_name = models.CharField(
+        "Channel Name",
+        max_length=20,
+        null=False,
+        blank=True
+    )
+    channel_admin_1 = models.ForeignKey(
+        'AuthenticationApp.UserProfile',
+        on_delete=models.CASCADE,
+        related_name="Admin_1"
+    )
+    channel_admin_2 = models.ForeignKey(
+        'AuthenticationApp.UserProfile',
+        on_delete=models.CASCADE,
+        related_name="Admin_2"
+    )
+
+    def __str__(self):
+        return self.channel_name

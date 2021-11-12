@@ -64,24 +64,3 @@ class UserProfile(AbstractUser):
 
     def __str__(self):
         return self.username + " " + self.user_id
-
-class ChannelDetails(models.Model):
-
-    Channel_name = models.CharField(
-        max_length=20,
-        null=False,
-        blank=True
-    )
-    Channel_admin_1 = models.ForeignKey(
-        'UserProfile',
-        on_delete=models.CASCADE,
-        related_name="Admin_1"
-    )
-    Channel_admin_2 = models.ForeignKey(
-        'UserProfile',
-        on_delete=models.CASCADE,
-        related_name="Admin_2"
-    )
-
-    def __str__(self):
-        return self.Channel_name
