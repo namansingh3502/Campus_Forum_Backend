@@ -18,7 +18,7 @@ class PostDetail(models.Model):
         "Post-Time",
         auto_now=True
     )
-    body = models.CharField(
+    body = models.TextField(
         "Post-Text",
         max_length=200,
         blank=True,
@@ -38,7 +38,7 @@ class PostDetail(models.Model):
     )
 
     def __str__(self):
-        return self.user.user_id + " " + str(self.time) + " " + str(self.is_active)
+        return str(self.pk)
 
 class PostImageStore(models.Model):
     """
@@ -52,6 +52,12 @@ class PostImageStore(models.Model):
         format = str(instance) + "_" + filename + '.' + file_extension
         return os.path.join(path, format)
 
+    post = models.ForeignKey(
+        "PostDetail",
+        on_delete=models.CASCADE,
+        related_name="Post_Id"
+    )
+
     image = models.FileField(
         "Post Image",
         upload_to=path_and_rename,
@@ -62,43 +68,26 @@ class PostImageStore(models.Model):
     def __str__(self):
         return self.image
 
-class PostImage(models.Model):
-    """
-    Relation of post and images is stored here
-    """
-
-    post = models.ForeignKey(
-        "PostDetail",
-        on_delete=models.CASCADE,
-        related_name="Post_Id"
-    )
-    image = models.ForeignKey(
-        "PostImageStore",
-        on_delete=models.CASCADE,
-        related_name="Post_Image_details"
-    )
-
-    def __str__(self):
-        return self.post + " " + self.image
-
 class PostLike(models.Model):
     """
     Handles details of likes on each post by users
     """
-
-    post = models.ForeignKey(
-        "PostDetail",
-        on_delete=models.CASCADE,
-        related_name="Post_Like"
-    )
     user = models.ForeignKey(
         "AuthenticationApp.UserProfile",
         on_delete=models.CASCADE,
         related_name="User_Like"
     )
+    post = models.ForeignKey(
+        "PostDetail",
+        on_delete=models.CASCADE,
+        related_name="Post_Like"
+    )
+
+    class Meta:
+        unique_together = ('user', 'post',)
 
     def __str__(self):
-        return self.post.id + " " + self.user
+        return str(self.post.id) + " " + str(self.user.user_id)
 
 class PostComment(models.Model):
     """
@@ -131,7 +120,7 @@ class PostComment(models.Model):
     )
 
     def __str__(self):
-        return self.post + " " + self.user + " " + self.datetime
+        return str(self.post.id)
 
 class ChannelDetail(models.Model):
 

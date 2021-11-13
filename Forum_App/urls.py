@@ -20,7 +20,7 @@ from . import views
 
 urlpatterns = [
     path('posts', views.Posts.as_view(), name="Basic-User" ),
-    path('channel-list', views.channel_list, name="Channel-List" ),
-    #path('<int:post_id>/likes>, views.post_likes, name="Post-Likes"),
-    #path('<int:post_id>/comments', views.post_comments, name="Post-Comments" ),
+    path('channel-list', views.ChannelList, name="Channel-List" ),
+    path('<int:post_id>/comments', views.PostCommentList, name="Post-Comments"),
+    path('<int:post_id>/likes', views.PostLikeList, name="Post-List" ),
 ]

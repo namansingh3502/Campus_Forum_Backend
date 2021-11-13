@@ -6,12 +6,20 @@ from AuthenticationApp.models import UserProfile
 from .models import *
 from .serializers import *
 
+@api_view(['GET'])
+def ChannelList(request):
+
+    channels = ChannelDetail.objects.all()
+    serializer = ChannelListSerializer(channels, many=True)
+
+    return Response(serializer.data)
+
 class Posts(APIView):
 
     def get(self,request):
 
-        posts = PostDetail.objects.filter(is_active=True)
-        serializer = PostDetailSerializer(posts)
+        posts = PostDetail.objects.all()
+        serializer = PostDetailSerializer(posts, many=True)
 
         return Response(serializer.data)
 
@@ -22,9 +30,17 @@ class Posts(APIView):
         return Response("post received")
 
 @api_view(['GET'])
-def channel_list(request):
+def PostCommentList(request, post_id):
 
-    channels = ChannelDetail.objects.all()
-    serializer = ChannelListSerializer(channels)
+    comments = PostComment.objects.filter(post=post_id)
+    serializer = PostCommentSerializer(comments,many=True)
 
     return Response(serializer.data)
+
+@api_view(['GET'])
+def PostLikeList(request, post_id):
+
+    likes = PostLike.objects.filter(post=post_id)
+    serializers = PostLikesSerializer(likes,many=True)
+
+    return Response(serializers.data)

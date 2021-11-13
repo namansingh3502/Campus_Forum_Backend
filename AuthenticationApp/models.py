@@ -63,4 +63,4 @@ class UserProfile(AbstractUser):
     )
 
     def __str__(self):
-        return self.username + " " + self.user_id
+        return self.username 

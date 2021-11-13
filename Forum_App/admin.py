@@ -6,24 +6,25 @@ from .models import *
 
 @admin.register(PostDetail)
 class Post_Detail_Admin(admin.ModelAdmin):
-    list_display = ('user','time',)
+    list_display = ('user','time','is_active')
 
     list_filter = ('is_active',)
 
-
-'''@admin.register(PostDetail)
-class Post_Detail_Admin(admin.ModelAdmin):
-    list_display = ('user','time',)
-
-    list_filter = ('is_active',)
-
-    fieldsets = (
-        ('Post Visibility', {
-            'fields': ('is_active',)
-        }),
-    )
-
-    readonly_fields = ['user', 'time', 'body', 'image_count']'''
+    '''
+    @admin.register(PostDetail)
+    class Post_Detail_Admin(admin.ModelAdmin):
+        list_display = ('user','time',)
+    
+        list_filter = ('is_active',)
+    
+        fieldsets = (
+            ('Post Visibility', {
+                'fields': ('is_active',)
+            }),
+        )
+    
+        readonly_fields = ['user', 'time', 'body', 'image_count']
+    '''
 
 @admin.register(PostComment)
 class Post_Comment_Admin(admin.ModelAdmin):
@@ -31,13 +32,15 @@ class Post_Comment_Admin(admin.ModelAdmin):
 
     list_filter = ('is_active',)
 
-    fieldsets = (
-        ('Comment Visibility',{
-            'fields':('is_active',)
-        }),
-    )
-
-    readonly_fields = ['post', 'user', 'datetime', 'body']
+    """
+        fieldsets = (
+            ('Comment Visibility',{
+                'fields':('is_active',)
+            }),
+        )
+    
+        readonly_fields = ['post', 'user', 'datetime', 'body']
+    """
 
 @admin.register(ChannelDetail)
 class Channel_Detail_List(admin.ModelAdmin):
@@ -54,3 +57,7 @@ class Channel_Detail_List(admin.ModelAdmin):
             'fields': ( 'channel_admin_1', 'channel_admin_2')
         }),
     )
+
+@admin.register(PostLike)
+class Post_Likes_List(admin.ModelAdmin):
+    list_display = ('user','post')

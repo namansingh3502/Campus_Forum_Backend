@@ -13,8 +13,6 @@ export default class PostColumn extends Component{
       <div className="mx-3 w-5/12 ">
         <CreatePost/>
         <Posts/>
-        <Posts/>
-        <Posts/>
       </div>
     )
   }

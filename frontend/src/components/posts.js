@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import image from "../images/userimg.jpeg"
 import imageplaceholder from "../images/image-placeholder.jpg"
 import { Comment } from "@material-ui/icons";
+import axios from "axios";
 
 const ChannelTags = () => {
   const Channels = ['#Channel-1','#Channel-2','#Channel-3','#Channel-4','#Channel-5','#Channel-6','#Channel-7']
@@ -16,24 +17,27 @@ const ChannelTags = () => {
   )
 }
 
-const UserDetails = () => {
+const UserDetails = (data) => {
+  const user = data.user
+
   return(
     <div className="flex">
       <img src={image} className="rounded-full" style={{height:50, width:50}} alt={"user image"}/>
       <div className="ml-4">
-        <h1 className="text-md">Lorem Ipsum</h1>
+        <h1 className="text-md">{user}</h1>
         <p className="text-sm">10 hrs</p>
       </div>
     </div>
   )
 }
 
-const PostText = () => {
+const PostText = (data) => {
+  const body = data.text
   return(
     <div className="p-1">
-      <h1 className="text-lg font-semibold">Post Heading</h1>
       <p className="text-md py-1">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        {body}
+      </p>
     </div>
   )
 }
@@ -76,23 +80,62 @@ const UserReaction = () =>{
 export default class Posts extends Component{
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      PostLoadStatus:'NotLoaded',
+      PostData:[],
+    }
+  }
+
+  loadPost() {
+    //const Token = localStorage.getItem("Token");
+
+    axios
+      .get('http://127.0.0.1:8000/forum/posts')
+      .then( response => {
+        if( response.status === 200 ){
+          this.setState({
+            PostData: response.data,
+            LoadStatus: 'Loaded'
+          })
+        }
+        else{
+          this.setState({
+            LoadStatus: 'NotLoaded'
+          })
+        }
+      })
+      .catch(error => {
+        console.log("check login error", error);
+      });
+  }
+
+  componentDidMount(){
+    this.loadPost()
   }
 
   render(){
 
+    const Post = this.state.PostData
+    console.log(Post)
+
     return(
-      <div className="p-4 bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-lg text-white h-auto mt-4">
+      <>
+        {Post.map((item, index) => {
+          return(
+            <div className="p-4 bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-lg text-white h-auto mt-4"
+                 key={index}
+            >
+              {console.log(Post[index].username)}
 
-        <UserDetails/>      {/* User image and user details */}
-        <ChannelTags/>      {/* All channels in which post is shared */}
-        <PostText/>         {/* Text in post if present */}
-        <PostImage/>        {/* Image in post if present */}
-        <UserReaction/>     {/* User reaction or like and comment*/}
-
-
-
-      </div>
+              <UserDetails user={Post[index].username} />      {/* User image and user details */}
+              {/*<ChannelTags />*/}      {/* All channels in which post is shared */}
+              <PostText text={Post[index].body}/>         {/* Text in post if present */}
+              {/* <PostImage/>  */}      {/* Image in post if present */}
+              <UserReaction/>     {/* User reaction or like and comment*/}
+            </div>
+          )}
+        )}
+      </>
     )
   }
 
