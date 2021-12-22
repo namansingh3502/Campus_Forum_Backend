@@ -15,10 +15,27 @@ class UserProfile(AbstractUser):
     """
 
     PREFIX = (
+        ('',''),
         ('Dr.','Dr.'),
         ('Mr.', 'Mr.'),
-        ('Miss.', 'Miss.'),
+        ('Ms.', 'Miss.'),
         ('Mrs.', 'Mrs.'),
+    )
+
+    DEPARTMENT = (
+        ('',''),
+        ('CSE', 'CSE'),
+        ('ISE', 'ISE'),
+        ('ECE', 'ECE'),
+        ('EEE', 'EEE'),
+        ('CIVIL', 'CIVIL'),
+        ('MECH','MECH')
+    )
+
+    GENDER = (
+        ('',''),
+        ('M', 'MALE'),
+        ('F', 'FEMALE')
     )
 
     def path_and_rename(instance, filename):
@@ -31,35 +48,23 @@ class UserProfile(AbstractUser):
     prefix = models.CharField(
         "Prefix",
         choices=PREFIX,
+        max_length=4,
+        blank=False
+    )
+
+    middle_name = models.CharField("Middle Name", max_length=150, blank=True)
+    phone = models.CharField("Mobile No.", max_length=10, blank=True)
+    gender = models.CharField("Gender", max_length=1, blank=True)
+
+    department = models.CharField(
+        "Department",
+        choices=DEPARTMENT,
         max_length=5,
-        default="Mr."
-    )
-    middle_name = models.CharField(
-        "Middle Name",
-        max_length=20,
-        blank=True,
-        null=True
-    )
-    phone = models.CharField(
-        "Mobile No.",
-        max_length=10,
-        default=""
-    )
-    user_id = models.CharField(
-        "USN/Staff-Id",
-        max_length=10,
-        default=""
-    )
-    address = models.CharField(
-        "Address",
-        max_length=100,
-        default=""
+        blank=False
     )
     user_image = models.FileField(
         "User Image",
         upload_to=path_and_rename,
-        null=True,
-        blank=True
     )
 
     def __str__(self):

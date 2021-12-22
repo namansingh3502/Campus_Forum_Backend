@@ -11,7 +11,7 @@ export default class ChannelList extends Component{
     }
   }
 
-  laodChannelList(){
+  loadChannelList(){
     //const Token = localStorage.getItem("Token");
 
     axios

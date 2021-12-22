@@ -10,33 +10,63 @@ class User_Profile_Admin(UserAdmin):
     list_filter = ('groups',)
 
     fieldsets = (
-        ('Authentication Details', {
-            'fields': ('username', 'password')
-        }),
         ('Profile', {
-            'fields':('prefix', 'first_name','middle_name','last_name', 'user_id', 'email', 'phone', 'address', 'user_image')
+            'fields': (
+                'username',
+                'prefix',
+                'first_name',
+                'middle_name',
+                'last_name',
+                'gender'
+                'department',
+                'email',
+                'phone',
+                'user_image')
         }),
         ('Permissions', {
-            'fields': ( 'is_active', 'is_staff', 'is_superuser','groups', 'user_permissions')
+            'fields': (
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions'
+            )
         }),
         ('Important dates', {
-            'fields': ('last_login', 'date_joined')
+            'fields': (
+                'last_login',
+                'date_joined'
+            )
         }),
     )
 
     add_fieldsets = (
         ('Authentication Details', {
-            'fields': ('username', 'password1', 'password2')
+            'fields': (
+                'username',
+                'password1',
+                'password2'
+            )
         }),
         ('Profile', {
             'fields': (
-            'prefix', 'first_name', 'middle_name', 'last_name', 'user_id', 'email', 'phone', 'address', 'user_image')
+            'prefix',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'gender',
+            'email',
+            'phone',
+            'user_image')
         }),
         ('Permissions', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
-        }),
-        ('Important dates', {
-            'fields': ('last_login', 'date_joined')
+            'fields': (
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions'
+            )
         }),
     )
 

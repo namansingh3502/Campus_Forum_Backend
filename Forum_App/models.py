@@ -5,141 +5,135 @@ from datetime import datetime
 
 # Create your models here.
 
-class PostDetail(models.Model):
+class Channel(models.Model):
     """
-    necessary information related to posts i.e.
-    who created , when created and body/text of post
+    Information related to Channel.
+    All fields are required.
     """
-    user = models.ForeignKey(
-        'AuthenticationApp.UserProfile',
-        on_delete=models.CASCADE
-    )
-    time = models.DateTimeField(
-        "Post-Time",
-        auto_now=True
-    )
-    body = models.TextField(
-        "Post-Text",
-        max_length=200,
-        blank=True,
-        null=True
-    )
-    image_count = models.PositiveIntegerField(
-        "Number of images attached to post",
-        default=0,
-        null=False,
-        blank=False
-    )
+
+    name = models.CharField("Channel Name", max_length=50, blank=False, null=False, unique=True)
     is_active = models.BooleanField(
-        "Is_Active",
+        'Is active',
         default=True,
-        null=False,
-        blank=False
+        help_text=
+            'Designates whether this channel should be treated as active. '
+            'Unselect this instead of deleting channels.'
+    )
+    admin = models.ForeignKey(
+        'AuthenticationApp.UserProfile',
+        on_delete=models.CASCADE,
+        related_name='Channel_Admin'
+    )
+
+    class Meta:
+        unique_together = ('name', 'admin',)
+
+    def __str__(self):
+        return self.name
+
+class Moderator(models.Model):
+    """
+    Channel moderator
+    """
+
+    user = models.ManyToManyField(
+        'AuthenticationApp.UserProfile',
+        related_name="Moderator"
+    )
+
+    channel = models.ForeignKey(
+        'Channel',
+        on_delete=models.CASCADE,
+        related_name="Channel"
     )
 
     def __str__(self):
-        return str(self.pk)
+        return self.channel.name
 
-class PostImageStore(models.Model):
+class Post(models.Model):
     """
-    images uploaded in posts are stored here
+        Information related to posts.
     """
+
+    body = models.TextField("Post text", blank=True)
+    time = models.DateTimeField(blank=False, default=datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S,%f'))
+    media_count = models.PositiveSmallIntegerField("Media count",default=0, blank=False);
+
+    is_hidden = models.BooleanField(
+        'Is Hidden',
+        default=False,
+        help_text=
+        'Designates whether this post should be treated as hidden. '
+        'Unselect this instead of deleting post.'
+    )
+
+    posted_in = models.ManyToManyField(
+        "Channel",
+        related_name="Post_Channel",
+    )
+
+    def __str__(self):
+        return "Post-Id : " + str(self.pk)
+
+class Post_Like(models.Model):
+    user = models.ForeignKey(
+        'AuthenticationApp.UserProfile',
+        related_name='User_liked',
+        on_delete=models.CASCADE
+    )
+
+    post = models.ForeignKey(
+        'Post',
+        related_name='Liked_Post',
+        on_delete=models.CASCADE
+    )
+    time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.user) + " " + str(self.post)
+
+class PostComment(models.Model):
+    user = models.ForeignKey(
+        'AuthenticationApp.UserProfile',
+        related_name='User_Commented',
+        on_delete=models.CASCADE
+    )
+
+    post = models.ForeignKey(
+        'Post',
+        related_name='Commented_Post',
+        on_delete=models.CASCADE
+    )
+
+    body = models.TextField("Comment", blank=False)
+    time = models.DateTimeField(auto_now=True)
+    is_hidden = models.BooleanField(
+        'Is Hidden',
+        default=False,
+        help_text=
+            'Designates whether this comment should be treated as visible. '
+            'Unselect this instead of deleting comment.'
+    )
+
+    def __str__(self):
+        return str(self.user) + " " + str(self.post)
+
+class Media(models.Model):
 
     def path_and_rename(instance):
-        path = "userimage/"
+        path = "postimages/"
         filename = now.strftime("%d_%m_%Y__%H_%M_%S")
         file_extension = filename.split('.')[-1]
         format = str(instance) + "_" + filename + '.' + file_extension
         return os.path.join(path, format)
 
-    post = models.ForeignKey(
-        "PostDetail",
-        on_delete=models.CASCADE,
-        related_name="Post_Id"
-    )
-
-    image = models.FileField(
-        "Post Image",
+    file_name = models.FileField(
+        "Media file",
         upload_to=path_and_rename,
-        null=True,
-        blank=True
     )
+
+    file_type = models.CharField("File Type ", default="image",max_length=5)
+
 
     def __str__(self):
-        return self.image
-
-class PostLike(models.Model):
-    """
-    Handles details of likes on each post by users
-    """
-    user = models.ForeignKey(
-        "AuthenticationApp.UserProfile",
-        on_delete=models.CASCADE,
-        related_name="User_Like"
-    )
-    post = models.ForeignKey(
-        "PostDetail",
-        on_delete=models.CASCADE,
-        related_name="Post_Like"
-    )
-
-    class Meta:
-        unique_together = ('user', 'post',)
-
-    def __str__(self):
-        return str(self.post.id) + " " + str(self.user.user_id)
-
-class PostComment(models.Model):
-    """
-    Handles details of Comment
-    which user commented on which post and when and what
-    """
-
-    post = models.ForeignKey(
-        "PostDetail",
-        on_delete=models.CASCADE,
-        related_name="Post_Comment"
-    )
-    user = models.ForeignKey(
-        "AuthenticationApp.UserProfile",
-        on_delete=models.CASCADE,
-        related_name="User_Comment"
-    )
-    datetime = models.DateTimeField(
-        auto_now=True
-    )
-    body = models.TextField(
-        max_length=100,
-        null=False,
-        blank=False
-    )
-    is_active = models.BooleanField(
-        default=True,
-        null=False,
-        blank=False
-    )
-
-    def __str__(self):
-        return str(self.post.id)
-
-class ChannelDetail(models.Model):
-
-    channel_name = models.CharField(
-        "Channel Name",
-        max_length=20,
-        null=False,
-        blank=True
-    )
-    channel_admin_1 = models.ForeignKey(
-        'AuthenticationApp.UserProfile',
-        on_delete=models.CASCADE,
-        related_name="Admin_1"
-    )
-    channel_admin_2 = models.ForeignKey(
-        'AuthenticationApp.UserProfile',
-        on_delete=models.CASCADE,
-        related_name="Admin_2"
-    )
-
-    def __str__(self):
-        return self.channel_name
+        return self.pk

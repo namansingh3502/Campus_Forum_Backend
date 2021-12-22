@@ -13,6 +13,7 @@
   "dependencies": {
     "@material-ui/icons": "^4.11.2",
     "axios": "^0.21.1",
+    "latest-version": "^6.0.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-icons": "^4.2.0",

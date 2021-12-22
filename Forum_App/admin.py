@@ -4,60 +4,85 @@ from .models import *
 
 # Register your models here.
 
-@admin.register(PostDetail)
-class Post_Detail_Admin(admin.ModelAdmin):
-    list_display = ('user','time','is_active')
+
+@admin.register(Channel)
+class ChannelAdmin(admin.ModelAdmin):
+    list_display = ('name', 'admin', 'is_active')
 
     list_filter = ('is_active',)
-
-    '''
-    @admin.register(PostDetail)
-    class Post_Detail_Admin(admin.ModelAdmin):
-        list_display = ('user','time',)
-    
-        list_filter = ('is_active',)
-    
-        fieldsets = (
-            ('Post Visibility', {
-                'fields': ('is_active',)
-            }),
-        )
-    
-        readonly_fields = ['user', 'time', 'body', 'image_count']
-    '''
-
-@admin.register(PostComment)
-class Post_Comment_Admin(admin.ModelAdmin):
-    list_display = ('post', 'user', 'datetime', 'is_active')
-
-    list_filter = ('is_active',)
-
-    """
-        fieldsets = (
-            ('Comment Visibility',{
-                'fields':('is_active',)
-            }),
-        )
-    
-        readonly_fields = ['post', 'user', 'datetime', 'body']
-    """
-
-@admin.register(ChannelDetail)
-class Channel_Detail_List(admin.ModelAdmin):
-    list_display = ('channel_name','channel_admin_1','channel_admin_2')
 
     fieldsets = (
-        ('Channel Detail',{
-            'fields': ('channel_name','channel_admin_1','channel_admin_2')
-         }),
-    )
-
-    add_fieldsets = (
-        ('Channel Detail',{
-            'fields': ( 'channel_admin_1', 'channel_admin_2')
+        ('Channel Details', {
+            'fields': ('name', 'admin', 'is_active')
         }),
     )
 
-@admin.register(PostLike)
-class Post_Likes_List(admin.ModelAdmin):
-    list_display = ('user','post')
+
+@admin.register(Moderator)
+class ModeratorAdmin(admin.ModelAdmin):
+    list_display = ('channel',)
+
+    fieldsets = (
+        ('Channel Moderators', {
+            'fields': ('channel', 'user')
+        }),
+    )
+
+    filter_horizontal = ('user',)
+
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+
+    """
+        def has_add_permission(self, request, obj=None):
+            return False
+
+        def has_delete_permission(self, request, obj=None):
+            return False
+    """
+
+    list_display = ('pk', 'time', 'is_hidden')
+
+    list_filter = ('is_hidden', )
+
+    fieldsets = (
+        ('Post Details', {
+            'fields': ('body', 'posted_in', 'is_hidden')
+        }),
+        ('Additional Details', {
+            'fields': ('time', 'media_count')
+        })
+    )
+
+    readonly_fields = ('time', 'media_count')
+
+    filter_horizontal = ('posted_in',)
+
+
+@admin.register(PostComment)
+class PostCommentAdmin(admin.ModelAdmin):
+
+    """
+        def has_add_permission(self, request, obj=None):
+            return False
+
+        def has_delete_permission(self, request, obj=None):
+            return False
+
+    """
+
+    list_display = ('post', 'user', 'is_hidden')
+
+    list_filter = ('is_hidden', )
+
+    fieldsets = (
+        ('Comment Details', {
+            'fields': ('user', 'post', 'body', 'time')
+        }),
+        ('Visibility', {
+            'fields': ('is_hidden',)
+        })
+    )
+
+    readonly_fields = ('user', 'post', 'time', 'body')
