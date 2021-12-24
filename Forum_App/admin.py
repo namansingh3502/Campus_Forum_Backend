@@ -13,22 +13,11 @@ class ChannelAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Channel Details', {
-            'fields': ('name', 'admin', 'is_active')
+            'fields': ('name', 'admin', 'is_active', 'moderator')
         }),
     )
 
-
-@admin.register(Moderator)
-class ModeratorAdmin(admin.ModelAdmin):
-    list_display = ('channel',)
-
-    fieldsets = (
-        ('Channel Moderators', {
-            'fields': ('channel', 'user')
-        }),
-    )
-
-    filter_horizontal = ('user',)
+    filter_horizontal = ('moderator',)
 
 
 @admin.register(Post)
@@ -60,7 +49,7 @@ class PostAdmin(admin.ModelAdmin):
     filter_horizontal = ('posted_in',)
 
 
-@admin.register(PostComment)
+@admin.register(Post_Comment)
 class PostCommentAdmin(admin.ModelAdmin):
 
     """
@@ -86,3 +75,17 @@ class PostCommentAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ('user', 'post', 'time', 'body')
+
+
+@admin.register(Post_Like)
+class PostLikeAdmin(admin.ModelAdmin):
+
+    list_display = ('user', 'post')
+
+    fieldsets = (
+        ('Like Details', {
+            'fields': ('user', 'post', 'time')
+        }),
+    )
+
+    readonly_fields = ('time',)

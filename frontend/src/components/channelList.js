@@ -35,7 +35,7 @@ export default class ChannelList extends Component{
   }
 
   componentDidMount() {
-    this.laodChannelList();
+    this.loadChannelList();
   }
 
   render() {
@@ -54,7 +54,7 @@ export default class ChannelList extends Component{
            style={{ height: 400 }}>
         <h1 className="text-center text-xl border-b-2 border-gray-500 text-white pb-2"> Channels </h1>
         <div className="text-center text-white overflow-hidden" style={{ height: 330 }}>
-          {Channel.map((item,index) => <h1 className="pl-4 font-medium text-white my-2" key={index}>{item.channel_name}</h1>)}
+          {Channel.map((item,index) => <h1 className="pl-4 font-medium text-white my-2" key={index}>{item.name}</h1>)}
         </div>
       </div>
     )

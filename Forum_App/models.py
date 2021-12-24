@@ -25,30 +25,16 @@ class Channel(models.Model):
         related_name='Channel_Admin'
     )
 
+    moderator = models.ManyToManyField(
+        'AuthenticationApp.UserProfile',
+        related_name="Moderator"
+    )
+
     class Meta:
         unique_together = ('name', 'admin',)
 
     def __str__(self):
         return self.name
-
-class Moderator(models.Model):
-    """
-    Channel moderator
-    """
-
-    user = models.ManyToManyField(
-        'AuthenticationApp.UserProfile',
-        related_name="Moderator"
-    )
-
-    channel = models.ForeignKey(
-        'Channel',
-        on_delete=models.CASCADE,
-        related_name="Channel"
-    )
-
-    def __str__(self):
-        return self.channel.name
 
 class Post(models.Model):
     """
@@ -76,6 +62,7 @@ class Post(models.Model):
         return "Post-Id : " + str(self.pk)
 
 class Post_Like(models.Model):
+
     user = models.ForeignKey(
         'AuthenticationApp.UserProfile',
         related_name='User_liked',
@@ -89,10 +76,13 @@ class Post_Like(models.Model):
     )
     time = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        unique_together = ('user', 'post')
+
     def __str__(self):
         return str(self.user) + " " + str(self.post)
 
-class PostComment(models.Model):
+class Post_Comment(models.Model):
     user = models.ForeignKey(
         'AuthenticationApp.UserProfile',
         related_name='User_Commented',
@@ -132,8 +122,36 @@ class Media(models.Model):
         upload_to=path_and_rename,
     )
 
-    file_type = models.CharField("File Type ", default="image",max_length=5)
+    file_type = models.CharField(
+        "File Type ",
+        default="image",
+        max_length=5
+    )
 
 
     def __str__(self):
         return self.pk
+
+
+class User_Post_Media(models.Model):
+
+    user = models.ForeignKey(
+        'AuthenticationApp.UserProfile',
+        related_name='User',
+        on_delete=models.CASCADE
+    )
+
+    post = models.ForeignKey(
+        'Post',
+        related_name='Post',
+        on_delete=models.CASCADE
+    )
+
+    media = models.ForeignKey(
+        'Media',
+        related_name='Media',
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return str(self.user)+"/"+str(self.post_id)+"/"+str(self.media)
