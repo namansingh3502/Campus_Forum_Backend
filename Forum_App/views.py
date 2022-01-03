@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from AuthenticationApp.models import UserProfile
+from AuthenticationApp.models import *
 from .models import *
 from .serializers import *
 
@@ -10,7 +10,7 @@ from .serializers import *
 @api_view(['GET'])
 def channels(request):
 
-    channel_list = Channel.objects.all()
+    channel_list = UserProfile.objects.get(pk=request.user).member_of.all()
     serializer = ChannelListSerializer(channel_list, many=True)
 
     return Response(serializer.data)

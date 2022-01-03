@@ -49,7 +49,7 @@ class UserProfile(AbstractUser):
         "Prefix",
         choices=PREFIX,
         max_length=4,
-        blank=False
+        blank=True
     )
 
     middle_name = models.CharField("Middle Name", max_length=150, blank=True)
@@ -60,12 +60,19 @@ class UserProfile(AbstractUser):
         "Department",
         choices=DEPARTMENT,
         max_length=5,
-        blank=False
+        blank=True
     )
     user_image = models.FileField(
         "User Image",
         upload_to=path_and_rename,
+        blank=True
+    )
+
+    member_of = models.ManyToManyField(
+        "Forum_App.Channel",
+        verbose_name="Channel Member",
+        blank=True
     )
 
     def __str__(self):
-        return self.username 
+        return self.username

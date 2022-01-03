@@ -17,17 +17,19 @@ class User_Profile_Admin(UserAdmin):
                 'first_name',
                 'middle_name',
                 'last_name',
-                'gender'
+                'gender',
                 'department',
                 'email',
                 'phone',
-                'user_image')
+                'user_image',
+            )
         }),
         ('Permissions', {
             'fields': (
                 'is_active',
                 'is_staff',
                 'is_superuser',
+                'member_of',
                 'groups',
                 'user_permissions'
             )
@@ -64,9 +66,12 @@ class User_Profile_Admin(UserAdmin):
                 'is_active',
                 'is_staff',
                 'is_superuser',
+                'member_of',
                 'groups',
                 'user_permissions'
             )
         }),
     )
+
+    filter_horizontal = ('member_of','groups','user_permissions')
 

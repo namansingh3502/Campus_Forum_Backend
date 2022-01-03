@@ -2,6 +2,8 @@ import os
 from django.db import models
 from django.utils import timezone
 from datetime import datetime
+from django.core.exceptions import ValidationError
+
 
 # Create your models here.
 
@@ -42,14 +44,14 @@ class Post(models.Model):
     """
 
     body = models.TextField("Post text", blank=True)
-    time = models.DateTimeField(blank=False, default=datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S,%f'))
+    time = models.DateTimeField(blank=False, auto_now=True)
     media_count = models.PositiveSmallIntegerField("Media count",default=0, blank=False);
 
     is_hidden = models.BooleanField(
         'Is Hidden',
         default=False,
         help_text=
-        'Designates whether this post should be treated as hidden. '
+        'Designates whether this post should be treated as hidden.'
         'Unselect this instead of deleting post.'
     )
 
@@ -128,7 +130,6 @@ class Media(models.Model):
         max_length=5
     )
 
-
     def __str__(self):
         return self.pk
 
@@ -138,20 +139,27 @@ class User_Post_Media(models.Model):
     user = models.ForeignKey(
         'AuthenticationApp.UserProfile',
         related_name='User',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False
     )
 
     post = models.ForeignKey(
         'Post',
         related_name='Post',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False
     )
 
     media = models.ForeignKey(
         'Media',
         related_name='Media',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
 
+
     def __str__(self):
-        return str(self.user)+"/"+str(self.post_id)+"/"+str(self.media)
+        return str(self.user)+"-"+str(self.post_id)+"-"+str(self.media)

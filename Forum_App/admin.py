@@ -89,3 +89,15 @@ class PostLikeAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ('time',)
+
+
+@admin.register(User_Post_Media)
+class UserPostMedia(admin.ModelAdmin):
+
+    list_display = ('user', 'post')
+
+    fieldsets = (
+        ('User Post Details ', {
+            'fields': ('user', 'post', 'media')
+        }),
+    )
