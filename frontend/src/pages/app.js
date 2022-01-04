@@ -2,8 +2,8 @@ import {BrowserRouter} from "react-router-dom";
 import React, { StrictMode, Component} from "react";
 import { render } from "react-dom";
 
-import MenuColumn from "../components/menuColumn";
-import PostColumn from "../components/postColumn";
+import MenuColumn from "../components/Menu_Column/menuColumn";
+import PostColumn from "../components/Post_Column/postColumn";
 import ActivityColumn from "../components/activityColumn";
 import Header from "../components/header";
 

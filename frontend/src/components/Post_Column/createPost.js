@@ -1,6 +1,6 @@
 import React from "react";
 
-import image from '../images/userimg.jpeg'
+import image from '../../images/userimg.jpeg'
 
 const CreatePost = () => {
   const MediaButton = ['Photo', 'Video', 'News']

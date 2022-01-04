@@ -3,12 +3,21 @@ from .models import *
 
 
 class PostSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user', read_only=True)
-    id = serializers.CharField(source='pk', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    body = serializers.CharField(source='post.body', read_only=True)
+    time = serializers.DateTimeField(source='post.time', read_only=True)
+    media_count = serializers.IntegerField(source='post.media_count', read_only=True)
 
     class Meta:
-        model = Post
-        fields = ['id', 'username', 'time', 'body', 'media_count']
+        model = User_Post_Media
+        fields = [
+            'user_id',
+            'username',
+            'post_id',
+            'body',
+            'time',
+            'media_count',
+        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -24,7 +33,7 @@ class LikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post_Like
-        fields = ('username',)
+        fields = ('username','user_id')
 
 
 class ChannelListSerializer(serializers.ModelSerializer):
