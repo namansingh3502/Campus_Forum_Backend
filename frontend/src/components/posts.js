@@ -87,10 +87,14 @@ export default class Posts extends Component{
   }
 
   loadPost() {
-    //const Token = localStorage.getItem("Token");
+    const Token = localStorage.getItem("Token");
 
     axios
-      .get('http://127.0.0.1:8000/forum/posts')
+      .get('http://127.0.0.1:8000/forum/posts',{
+          headers: {
+            'Authorization': Token
+          }
+      })
       .then( response => {
         if( response.status === 200 ){
           this.setState({

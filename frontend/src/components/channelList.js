@@ -12,10 +12,14 @@ export default class ChannelList extends Component{
   }
 
   loadChannelList(){
-    //const Token = localStorage.getItem("Token");
+    const Token = localStorage.getItem("Token");
 
     axios
-      .get('http://127.0.0.1:8000/forum/channel-list')
+      .get('http://127.0.0.1:8000/forum/channel-list',{
+          headers: {
+            'Authorization': Token
+          }
+      })
       .then( response => {
         if( response.status === 200 ){
           this.setState({
