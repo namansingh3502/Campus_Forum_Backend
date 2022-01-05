@@ -8,14 +8,13 @@ export default class Posts extends Component{
     this.state = {
       LikeLoadStatus:'NotLoaded',
       LikeData:[],
-      Liked:true
     }
   }
 
   loadLikes() {
     const Token = localStorage.getItem("Token");
-    const user_id = this.props.user;
     const post_id = this.props.post;
+    const current_user = localStorage.getItem("user_id");
 
     axios
       .get(`http://127.0.0.1:8000/forum/${post_id}/likes`,{
@@ -25,10 +24,15 @@ export default class Posts extends Component{
       })
       .then( response => {
         if( response.status === 200 ){
-          console.log(response.data)
+          const data = response.data
+          for(let i = 0; i < data.length; i++ ){
+            if(parseInt(current_user) === data[i].user_id){
+              this.props.handleLike()
+            }
+          }
           this.setState({
-            LikeData: response.data,
-            LoadStatus: 'Loaded'
+            LikeData: data,
+            LikeLoadStatus: 'Loaded',
           })
         }
         else{
@@ -47,12 +51,13 @@ export default class Posts extends Component{
   }
 
   render(){
-    const liked = this.state.Liked;
-    const likedList = this.state.LikeData;
+    const liked = this.props.Liked;
+    const likedList = this.state.LikeData
 
     return(
       <div className="text-sm ml-2">
-        <p> { liked ? 'You' : null }
+        <p>
+          { liked ? 'You' : null }
           { (likedList.length === 1 && liked ) ? ' and ' : null }
           { (likedList.length > 1 && liked ) ? ', ' : null }
           { likedList.length ? likedList[0].username + ' ' : null }
