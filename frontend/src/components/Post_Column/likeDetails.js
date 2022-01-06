@@ -12,15 +12,16 @@ export default class Posts extends Component{
   }
 
   loadLikes() {
-    const Token = localStorage.getItem("Token");
     const post_id = this.props.post;
     const current_user = localStorage.getItem("user_id");
 
     axios
-      .get(`http://127.0.0.1:8000/forum/${post_id}/likes`,{
-        headers: {
-          'Authorization': Token
-        }
+      .get(
+        `http://localhost:8000/forum/${post_id}/likes`,
+        {
+          headers: {
+            'Authorization': localStorage.getItem("Token")
+          }
       })
       .then( response => {
         if( response.status === 200 ){
@@ -42,7 +43,7 @@ export default class Posts extends Component{
         }
       })
       .catch(error => {
-        console.log("check login error", error);
+        console.log("check like detail error", error);
       });
   }
 

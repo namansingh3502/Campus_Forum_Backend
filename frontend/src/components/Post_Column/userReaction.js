@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import LikeDetails from "./likeDetails";
+import axios from "axios";
 
 export default class UserReaction extends Component{
   constructor(props) {
@@ -8,6 +9,7 @@ export default class UserReaction extends Component{
       Liked:false
     }
     this.handleLike = this.handleLike.bind(this);
+    this.updateLike = this.updateLike.bind(this);
   }
 
   handleLike() {
@@ -16,6 +18,31 @@ export default class UserReaction extends Component{
     })
   }
 
+  updateLike() {
+    axios
+      .post(
+        `http://127.0.0.1:8000/forum/updateLike`,
+        {
+            post_id : this.props.post
+          },
+        {
+          headers: {
+            'Authorization': localStorage.getItem("Token")
+          }
+      })
+      .then( response => {
+        if(response.status === 200 ){
+          console.log("updated like status to ", response.data)
+          this.handleLike()
+        }
+        else{
+          console.log("Some error happened in updating like status.")
+        }
+      })
+      .catch(error => {
+        console.log("check like update error ", error)
+      })
+  }
 
   render(){
     return(
@@ -28,7 +55,7 @@ export default class UserReaction extends Component{
         <div className="mt-1 grid grid-cols-3 gap-x-3 justify-center border-t border-gray-600 pt-3 ">
           <button
             className="bg-gray-400 rounded-full bg-opacity-10 h-10"
-            onClick={this.handleLike}
+            onClick={this.updateLike}
           >
             Like
           </button>
