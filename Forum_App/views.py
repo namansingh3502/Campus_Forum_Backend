@@ -2,6 +2,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+import json
+
 from AuthenticationApp.models import *
 from .models import *
 from .serializers import *
@@ -18,29 +20,20 @@ def channels(request):
 
     return Response(serializer.data)
 
+@api_view(['GET'])
+def posts_user(request):
 
-class Posts(APIView):
+    channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
+    channel_list = list(map(lambda x: x[0], channel))
 
-    def get(self, request):
+    posts = Post.objects.filter(posted_in__in=channel_list, is_hidden=False).distinct()[:5]
+    post_id = list(posts.values_list('id'))
+    post_id = list(map(lambda x: x[0], post_id))
 
-        channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
-        channel_list = list(map(lambda x: x[0], channel))
+    data = User_Post_Media.objects.filter(post__in=post_id).order_by('-pk')
+    serializer = PostSerializer(data, many=True)
 
-        posts = Post.objects.filter(posted_in__in=channel_list, is_hidden=False).order_by('-pk').distinct()[:5]
-        post_id = list(posts.values_list('id'))
-        post_id = list(map(lambda x: x[0], post_id))
-
-        data = User_Post_Media.objects.filter(post__in=post_id)
-
-        serializer = PostSerializer(data, many=True)
-
-        return Response(serializer.data)
-
-    def post(self, request):
-
-        print(request)
-
-        return Response("post received")
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -53,7 +46,7 @@ def post_comment(request, post_id):
 
 
 @api_view(['GET'])
-def post_like(request, post_id):
+def post_likes(request, post_id):
 
     likes = Post_Like.objects.filter(post=post_id)
     serializer = LikeSerializer(likes, many=True)
@@ -61,15 +54,20 @@ def post_like(request, post_id):
     return Response(serializer.data)
 
 
-"""
-val = list(UserProfile.objects.get(pk=1).member_of.all().values_list('id'))
-channel = list(map(lambda x: x[0], val))
+@api_view(['GET'])
+def update_post_like(request, post_id):
 
-posts = Post.objects.filter(posted_in__in=channel, is_hidden=False).order_by('-pk').distinct()[:5]
-post_id = list(posts.values_list('id'))
-post_id = list(map(lambda x: x[0], post_id))
+    try:
+        like = Post_Like.objects.get(
+            user_id=request.user.pk,
+            post_id=post_id
+        )
+        like.delete()
+    except Post_Like.DoesNotExist:
+        like = Post_Like(
+            user_id=request.user.pk,
+            post_id=post_id
+        )
+        like.save()
 
-data = User_Post_Media.objects.filter(post__in=post_id)
-data = val.values_list('user__username','post__body')
-
-"""
+    return Response({'msg':'got the call'})

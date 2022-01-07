@@ -33,7 +33,7 @@ class LikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post_Like
-        fields = ('username','user_id')
+        fields = ('username', 'user_id')
 
 
 class ChannelListSerializer(serializers.ModelSerializer):

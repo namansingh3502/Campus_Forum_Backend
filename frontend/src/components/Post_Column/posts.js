@@ -4,7 +4,7 @@ import imageplaceholder from "../../images/image-placeholder.jpg"
 import { Comment } from "@material-ui/icons";
 import axios from "axios";
 
-import UserReaction from "./userReaction";
+import UserReaction from "./User_Reaction/userReaction";
 import PostText from "./postText";
 import UserDetails from "./userDetails";
 import ChannelTags from "./channelTags";
@@ -60,7 +60,7 @@ export default class Posts extends Component{
         {Post.map((item, index) => {
           return(
             <div className="p-4 bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-lg text-white h-auto mt-4"
-                 key={Post[index].post_id} value={Post[index].post_id}
+                 key={Post[index].post_id}
             >
               <UserDetails user={Post[index].username} />      {/* User image and user details */}
               {/*<ChannelTags />*/}                            {/* All channels in which post is shared */}
