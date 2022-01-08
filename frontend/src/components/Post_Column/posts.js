@@ -9,7 +9,6 @@ import PostText from "./postText";
 import UserDetails from "./userDetails";
 import ChannelTags from "./channelTags";
 import PostImage from "./postImage";
-import LikeDetails from "./likeDetails";
 
 export default class Posts extends Component{
   constructor(props) {
@@ -63,7 +62,7 @@ export default class Posts extends Component{
                  key={Post[index].post_id}
             >
               <UserDetails user={Post[index].username} />      {/* User image and user details */}
-              {/*<ChannelTags />*/}                            {/* All channels in which post is shared */}
+              <ChannelTags />                                  {/* All channels in which post is shared */}
               <PostText text={Post[index].body}/>              {/* Text in post if present */}
               {/* <PostImage/>  */}                            {/* Image in post if present */}
               <UserReaction

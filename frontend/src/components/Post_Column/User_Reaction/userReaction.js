@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import LikeDetails from "../likeDetails";
+import LikeDetails from "./likeDetails";
 import axios from "axios";
 
 export default class UserReaction extends Component{
