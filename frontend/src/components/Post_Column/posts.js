@@ -59,15 +59,22 @@ export default class Posts extends Component{
         {Post.map((item, index) => {
           return(
             <div className="p-4 bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-lg text-white h-auto mt-4"
-                 key={Post[index].post_id}
+                 key={Post[index].post_data.id}
             >
-              <UserDetails user={Post[index].username} />      {/* User image and user details */}
-              <ChannelTags />                                  {/* All channels in which post is shared */}
-              <PostText text={Post[index].body}/>              {/* Text in post if present */}
-              {/* <PostImage/>  */}                            {/* Image in post if present */}
+              <UserDetails
+                username={Post[index].username}
+                user_id={Post[index].user_id}
+               />
+              <ChannelTags
+                channel_list={Post[index].post_data.channel_name}
+              />
+              <PostText
+                text={Post[index].post_data.body}
+              />
+              {/* <PostImage/>  */}
               <UserReaction
-                post={Post[index].post_id}
-              />                                                {/* User reaction or like and comment*/}
+                post={Post[index].post_data.id}
+              />
             </div>
           )}
         )}

@@ -1,8 +1,7 @@
 import React from "react";
-
 import image from '../../images/userimg.jpeg'
 
-const CreatePost = () => {
+export default function CreatePost() {
   const MediaButton = ['Photo', 'Video', 'News']
 
   return (
@@ -18,16 +17,12 @@ const CreatePost = () => {
           Start a Post...
         </button>
       </div>
-
       <div className="grid grid-cols-3 mx-auto w-full justify-items-center mt-4" >
         {MediaButton.map( (item) => {return(
             <div key={item}><button>{item}</button></div>
           )})
         }
       </div>
-
     </div>
-
   )
 }
-export default CreatePost
