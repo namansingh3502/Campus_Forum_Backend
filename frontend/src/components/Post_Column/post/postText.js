@@ -1,14 +1,11 @@
 import React from "react";
 
-const PostText = (data) => {
-  const body = data.text
+export default function PostText(data) {
   return(
     <div className="p-2">
       <p className="text-md py-1">
-        {body}
+        {data.text}
       </p>
     </div>
   )
 }
-
-export default PostText

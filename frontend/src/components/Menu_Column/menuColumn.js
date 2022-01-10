@@ -14,7 +14,7 @@ export default class MenuColumn extends Component{
 
   render(){
     return (
-      <div className="w-2/12">
+      <div className="w-1/6">
         <MenuKeys/>
         <ChannelList/>
         <Others/>

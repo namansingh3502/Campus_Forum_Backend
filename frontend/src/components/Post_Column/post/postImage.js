@@ -1,7 +1,7 @@
-import imagePlaceHolder from "../../images/image-placeholder.jpg";
+import imagePlaceHolder from "../../../images/image-placeholder.jpg";
 import React from "react";
 
-const PostImage = () => {
+export default function PostImage(){
   return(
     <div className="grid grid-cols-2 justify-center gap-x-2">
       <button className={"mx-auto p-1"}>
@@ -19,5 +19,3 @@ const PostImage = () => {
     </div>
   )
 }
-
-export default PostImage

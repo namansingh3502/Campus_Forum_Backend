@@ -1,7 +1,7 @@
-import userImage from "../../images/userimg.jpeg"
+import userImage from "../../../images/userimg.jpeg"
 import React from "react";
 
-const UserDetails = (data) => {
+export default function UserDetails (data) {
   return(
     <div className="flex">
       <img src={userImage} className="rounded-full" style={{height:50, width:50}} alt={"user"}/>
@@ -12,5 +12,3 @@ const UserDetails = (data) => {
     </div>
   )
 }
-
-export default UserDetails

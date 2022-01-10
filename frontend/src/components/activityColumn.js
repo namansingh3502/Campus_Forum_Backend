@@ -8,7 +8,7 @@ export default class ActivityColumn extends Component{
 
   render() {
     return (
-      <div className="w-1/5">
+      <div className="w-1/6">
         <div
           className="bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-lg text-lg p-4"
           style={{height:400}}

@@ -1,5 +1,7 @@
 import React from "react";
-import image from '../../images/userimg.jpeg'
+
+import image from '../../../../images/userimg.jpeg'
+import PostCreateModal from "./postCreateModal";
 
 export default function CreatePost() {
   const MediaButton = ['Photo', 'Video', 'News']
@@ -16,6 +18,9 @@ export default function CreatePost() {
         <button className="bg-gray-400 rounded-full bg-opacity-20 w-full text-black ml-4 h-14 px-4 text-left text-white text-lg">
           Start a Post...
         </button>
+
+        <PostCreateModal/>
+
       </div>
       <div className="grid grid-cols-3 mx-auto w-full justify-items-center mt-4" >
         {MediaButton.map( (item) => {return(

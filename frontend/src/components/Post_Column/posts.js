@@ -4,11 +4,11 @@ import imageplaceholder from "../../images/image-placeholder.jpg"
 import { Comment } from "@material-ui/icons";
 import axios from "axios";
 
-import UserReaction from "./User_Reaction/userReaction";
-import PostText from "./postText";
-import UserDetails from "./userDetails";
-import ChannelTags from "./channelTags";
-import PostImage from "./postImage";
+import UserReaction from "./post/User_Reaction/userReaction";
+import PostText from "./post/postText";
+import UserDetails from "./post/userDetails";
+import ChannelTags from "./post/channelTags";
+import PostImage from "./post/postImage";
 
 export default class Posts extends Component{
   constructor(props) {

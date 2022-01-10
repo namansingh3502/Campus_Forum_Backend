@@ -99,7 +99,7 @@ export default class UserReaction extends Component{
   render(){
 
     if( this.state.PostLikeLoadStatus !== 'Loaded' ){
-      return <>hello</>
+      return(<>Loading</>)
     }
 
     return(

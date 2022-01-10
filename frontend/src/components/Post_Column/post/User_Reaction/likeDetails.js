@@ -1,12 +1,8 @@
-import React, { Component } from "react";
-import axios from "axios";
-
+import React from "react";
 
 export default function LikeDetails(props){
   const liked = props.Liked
   const likedList = props.UserLiked
-
-    console.log(props)
 
   return(
     <div className="text-sm ml-2">
@@ -20,6 +16,5 @@ export default function LikeDetails(props){
         { (likedList.length > 0 ) ? 'liked the post.' : null }
       </p>
     </div>
-)
-
+  )
 }

@@ -1,5 +1,5 @@
 import React, { Component} from "react";
-import CreatePost from "./createPost";
+import CreatePost from "./post/Create_Post/createPost";
 import Posts from "./posts";
 
 export default class PostColumn extends Component{
