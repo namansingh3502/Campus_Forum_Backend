@@ -6,15 +6,29 @@ import PostCreateModal from "./post/Create_Post/postCreateModal";
 export default class PostColumn extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      showNewPostModal: false
+    };
+  }
+
+  updateModalVisibility(){
+    this.setState({
+      showNewPostModal: !this.state.showNewPostModal
+    })
   }
 
   render() {
     return (
       <div className="mx-3 w-5/12 ">
-        <CreatePost />
+        <CreatePost
+          updateNewPost={()=>{this.updateModalVisibility()}}
+        />
         <Posts />
-        <PostCreateModal />
+        <PostCreateModal
+          updateNewPost={()=>{this.updateModalVisibility()}}
+          ShowModal={this.state.showNewPostModal}
+        />
+
       </div>
     );
   }

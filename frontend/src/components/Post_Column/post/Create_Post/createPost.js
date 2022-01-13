@@ -1,9 +1,8 @@
 import React from "react";
 
 import image from "../../../../images/userimg.jpeg";
-import PostCreateModal from "./postCreateModal";
 
-export default function CreatePost() {
+export default function CreatePost(props) {
   const MediaButton = ["Photo", "Video", "News"];
 
   return (
@@ -15,7 +14,12 @@ export default function CreatePost() {
           alt={"logo"}
           style={{ width: 60, height: 60 }}
         />
-        <button className="bg-gray-400 rounded-full bg-opacity-20 w-full text-black ml-4 h-14 px-4 text-left text-white text-lg">
+        <button
+          className="bg-gray-400 rounded-full bg-opacity-20 w-full ml-4 h-14 px-4 text-left text-white text-lg"
+          onClick ={() => {
+            props.updateNewPost();
+          }}
+        >
           Start a Post...
         </button>
       </div>

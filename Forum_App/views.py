@@ -7,7 +7,7 @@ import json
 from AuthenticationApp.models import *
 from .models import *
 from .serializers import *
-
+from .forms import *
 
 @api_view(['GET'])
 def channels(request):
@@ -71,3 +71,18 @@ def update_post_like(request, post_id):
         like.save()
 
     return Response({'msg':'got the call'})
+
+
+@api_view(['POST'])
+def new_post(request):
+    data = json.loads(request.body)
+    newPost = NewPost(data)
+    msg="dont know what happened"
+    if newPost.is_valid():
+        post = Post(body=data['body'], media_count=data['media_count'])
+        post.save()
+        msg = "post created successfully"
+    else:
+        msg = "some error occured while creating post"
+
+    return Response({'msg':msg})
