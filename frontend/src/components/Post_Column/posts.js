@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import imageplaceholder from "../../images/image-placeholder.jpg";
+import imageplaceholder from "../../images/image-placeholder.jpg"
 import { Comment } from "@material-ui/icons";
 import axios from "axios";
 
@@ -10,68 +10,76 @@ import UserDetails from "./post/userDetails";
 import ChannelTags from "./post/channelTags";
 import PostImage from "./post/postImage";
 
-export default class Posts extends Component {
+export default class Posts extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      PostLoadStatus: "NotLoaded",
-      PostData: [],
-    };
+      PostLoadStatus:'NotLoaded',
+      PostData:[]
+    }
   }
 
   loadPost() {
     const Token = localStorage.getItem("Token");
 
     axios
-      .get("http://127.0.0.1:8000/forum/posts", {
-        headers: {
-          Authorization: Token,
-        },
+      .get('http://127.0.0.1:8000/forum/posts',{
+          headers: {
+            'Authorization': Token
+          }
       })
-      .then((response) => {
-        if (response.status === 200) {
+      .then( response => {
+        if( response.status === 200 ){
           this.setState({
             PostData: response.data,
-            LoadStatus: "Loaded",
-          });
-        } else {
+            LoadStatus: 'Loaded'
+          })
+        }
+        else{
           this.setState({
-            LoadStatus: "NotLoaded",
-          });
+            LoadStatus: 'NotLoaded'
+          })
         }
       })
-      .catch((error) => {
+      .catch(error => {
         console.log("check login error", error);
       });
   }
 
-  componentDidMount() {
-    this.loadPost();
+  componentDidMount(){
+    this.loadPost()
   }
 
-  render() {
-    const Post = this.state.PostData;
+  render(){
 
-    return (
+    const Post = this.state.PostData
+
+    return(
       <>
         {Post.map((item, index) => {
-          return (
-            <div
-              className="p-4 bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-lg text-white h-auto mt-4"
-              key={Post[index].post_data.id}
+          return(
+            <div className="p-4 bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-lg text-white h-auto mt-4"
+                 key={Post[index].post_data.id}
             >
               <UserDetails
                 username={Post[index].username}
                 user_id={Post[index].user_id}
+               />
+              <ChannelTags
+                channel_list={Post[index].post_data.channel_name}
               />
-              <ChannelTags channel_list={Post[index].post_data.channel_name} />
-              <PostText text={Post[index].post_data.body} />
+              <PostText
+                text={Post[index].post_data.body}
+              />
               {/* <PostImage/>  */}
-              <UserReaction post={Post[index].post_data.id} />
+              <UserReaction
+                post={Post[index].post_data.id}
+              />
             </div>
-          );
-        })}
+          )}
+        )}
       </>
-    );
+    )
   }
+
 }

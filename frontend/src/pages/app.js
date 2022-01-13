@@ -1,6 +1,5 @@
-// eslint-disable-next-line import/namespace
-import { BrowserRouter } from "react-router-dom";
-import React, { StrictMode, Component } from "react";
+import {BrowserRouter} from "react-router-dom";
+import React, { StrictMode, Component} from "react";
 import { render } from "react-dom";
 
 import MenuColumn from "../components/Menu_Column/menuColumn";
@@ -12,27 +11,28 @@ import axios from "axios";
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {}
   }
 
-  loadUserData() {
+  loadUserData(){
     const Token = localStorage.getItem("Token");
     axios
-      .get("http://127.0.0.1:8000/auth/users/me", {
+      .get('http://127.0.0.1:8000/auth/users/me',{
         headers: {
-          Authorization: Token,
-        },
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          localStorage.setItem("user_id", response.data.id);
-          localStorage.setItem("user_name", response.data.username);
-        } else {
-          console.log(response.status);
-          console.log(response.data);
+          'Authorization': Token
         }
       })
-      .catch((error) => {
+      .then( response => {
+        if( response.status === 200 ){
+          localStorage.setItem('user_id', response.data.id)
+          localStorage.setItem('user_name', response.data.username)
+        }
+        else{
+          console.log(response.status)
+          console.log(response.data)
+        }
+      })
+      .catch(error => {
         console.log("check login error", error);
       });
   }
@@ -41,24 +41,24 @@ export default class App extends Component {
     this.loadUserData();
   }
 
-  render() {
-    return (
+  render (){
+    return(
       <div className="min-h-screen">
-        <Header />
+        <Header/>
         <div className="flex w-4/5 mx-auto mt-4 justify-center ">
-          <MenuColumn />
-          <PostColumn />
-          <ActivityColumn />
+          <MenuColumn/>
+          <PostColumn/>
+          <ActivityColumn/>
         </div>
-      </div>
-    );
+    </div>
+    )
   }
-}
+};
 
 render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <App/>
     </BrowserRouter>
   </StrictMode>,
   document.getElementById("root")

@@ -2,13 +2,11 @@
   "name": "frontend",
   "version": "1.0.0",
   "description": "frontend for college forum",
+  "main": "index.js",
   "scripts": {
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --quiet",
-    "dev": "parcel src/pages/index.html",
-    "build": "parcel build src/pages/index.html",
-    "watch": "parcel watch src/pages/index.html",
-    "prod": "parcel dist/index.html"
+    "dev": "parcel src/pages/index.html"
   },
   "author": "Naman Singh",
   "license": "ISC",
