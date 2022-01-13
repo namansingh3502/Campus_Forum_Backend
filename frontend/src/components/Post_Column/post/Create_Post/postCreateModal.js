@@ -1,8 +1,10 @@
-import React from "react"
+import React, { useState } from "react";
 import { AiOutlineClose } from "react-icons/all";
 import userImage from "../../../../images/userimg.jpeg";
 
 export default function PostCreateModal(){
+  const [text, updateText] = useState("");
+
   const username = localStorage.getItem('user_name')
   const user_id = localStorage.getItem('user_id')
 
@@ -12,7 +14,7 @@ export default function PostCreateModal(){
       id={'postCreateModal'}
     >
       <div
-        className={"h-auto w-3/12 relative top-20 mx-auto border shadow-lg rounded-md  body"}
+        className={"h-auto w-3/12 relative top-20 mx-auto border shadow-lg rounded-md"}
         style={{backgroundColor:'#011627'}}
       >
         <div className={"bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-xl h-full w-full"}>
@@ -36,7 +38,9 @@ export default function PostCreateModal(){
                 <textarea
                   className="resize-none w-full h-32 p-2 bg-transparent focus:outline-0 text-white text-xl"
                   placeholder={"What do you want to talk about?"}
+                  value={text}
                   style={{outline:"none"}}
+                  onChange={(e) => updateText(e.target.value)}
                 />
               </div>
               <div>
