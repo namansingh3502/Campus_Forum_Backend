@@ -8,18 +8,18 @@ export default function PostCreateModal() {
 
   return (
     <div
-      className={"fixed inset-0 bg-black bg-opacity-60 h-full w-full"}
+      className={"fixed inset-0 bg-gray-400 bg-opacity-60 h-full w-full"}
       id={"postCreateModal"}
     >
       <div
         className={
-          "h-auto w-3/12 relative top-20 mx-auto border shadow-lg rounded-md  body"
+          "h-auto w-3/12 relative top-20 mx-auto border-0 shadow-lg rounded-lg"
         }
-        style={{ backgroundColor: "#011627" }}
+        style={{ backgroundColor: "#011627"}}
       >
         <div
           className={
-            "bg-gray-400 rounded-lg bg-opacity-10 backdrop-filter backdrop-blur-xl h-full w-full"
+            "bg-gray-400 rounded-lg border-0 bg-opacity-20 backdrop-filter h-full w-full text-amber-50"
           }
         >
           <div className={"divide-y divide-gray-700"}>
@@ -50,8 +50,8 @@ export default function PostCreateModal() {
                   style={{ outline: "none" }}
                 />
               </div>
-              <div>
-                <button className="w-full mx-2 bg-blue-400 mx-auto text-lg rounded-md p-2">
+              <div className={"mx-auto"}>
+                <button className="w-full bg-blue-400 mx-auto text-lg rounded-md p-2">
                   Post
                 </button>
               </div>
