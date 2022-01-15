@@ -53,7 +53,7 @@ export default class Posts extends Component {
     const Post = this.state.PostData;
 
     return (
-      <>
+      <div>
         {Post.map((item, index) => {
           return (
             <div
@@ -71,7 +71,7 @@ export default class Posts extends Component {
             </div>
           );
         })}
-      </>
+      </div>
     );
   }
 }

@@ -24,7 +24,7 @@ export default class UserReaction extends Component {
     //const current_user = localStorage.getItem("user_id");
 
     axios
-      .get(`http://localhost:8000/forum/${post_id}/like-post`, {
+      .post(`http://localhost:8000/forum/${post_id}/like-post`,{}, {
         headers: {
           Authorization: localStorage.getItem("Token"),
         },
@@ -100,8 +100,7 @@ export default class UserReaction extends Component {
           Liked={this.state.PostLiked}
           handleLike={() => this.handleLike()}
           UserLiked={this.state.UserLiked}
-        />{" "}
-        {/* Likes Count and liked on not */}
+        />
         <div className="mt-1 grid grid-cols-3 gap-x-3 justify-center border-t border-gray-600 pt-3 ">
           <button
             className="bg-gray-400 rounded-full bg-opacity-10 h-10"

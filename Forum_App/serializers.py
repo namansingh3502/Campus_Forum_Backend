@@ -58,4 +58,7 @@ class LikeSerializer(serializers.ModelSerializer):
 class ChannelListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Channel
-        fields = ('name', )
+        fields = [
+            'name',
+            'id'
+        ]

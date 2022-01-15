@@ -26,11 +26,12 @@ def posts_user(request):
     channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
     channel_list = list(map(lambda x: x[0], channel))
 
-    posts = Post.objects.filter(posted_in__in=channel_list, is_hidden=False).distinct()[:5]
+    posts = Post.objects.filter(posted_in__in=channel_list, is_hidden=False).distinct()
     post_id = list(posts.values_list('id'))
     post_id = list(map(lambda x: x[0], post_id))
 
     data = User_Post_Media.objects.filter(post__in=post_id).order_by('-pk')
+
     serializer = PostSerializer(data, many=True)
 
     return Response(serializer.data)
@@ -54,7 +55,7 @@ def post_likes(request, post_id):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def update_post_like(request, post_id):
 
     try:
@@ -76,13 +77,31 @@ def update_post_like(request, post_id):
 @api_view(['POST'])
 def new_post(request):
     data = json.loads(request.body)
-    newPost = NewPost(data)
-    msg="dont know what happened"
-    if newPost.is_valid():
-        post = Post(body=data['body'], media_count=data['media_count'])
-        post.save()
-        msg = "post created successfully"
-    else:
-        msg = "some error occured while creating post"
 
-    return Response({'msg':msg})
+    if data['text'] == "" and data['channel_list'] == []:
+        return Response(status=400)
+
+    newPost = NewPost(data)
+
+    if newPost.is_valid() :
+        post = Post.objects.create(
+            body = data['text'],
+            media_count = data['media_count']
+        )
+        post.save()
+        for channel in data['channel_list']:
+            try:
+                channel = Channel.objects.get(id=channel['id'])
+                post.posted_in.add(channel)
+            except Channel.DoesNotExist:
+                msg = "Error with channel id"
+                return Response(status=400)
+
+        userPostMedia = User_Post_Media.objects.create(
+            user_id=request.user.pk,
+            post_id=post.pk
+        )
+    else:
+        return Response(status=400)
+
+    return Response({'msg':'post created succesfully'})

@@ -160,6 +160,5 @@ class User_Post_Media(models.Model):
         null=True
     )
 
-
     def __str__(self):
         return str(self.user)+"-"+str(self.post_id)+"-"+str(self.media)
