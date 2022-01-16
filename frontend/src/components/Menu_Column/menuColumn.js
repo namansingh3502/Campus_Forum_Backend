@@ -16,7 +16,9 @@ export default class MenuColumn extends Component {
     return (
       <div className="w-1/6">
         <MenuKeys />
-        <ChannelList />
+        <ChannelList
+          ChannelList={this.props.ChannelList}
+        />
         <Others />
       </div>
     );

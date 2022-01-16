@@ -99,9 +99,18 @@ export default class PostCreateModal extends Component{
   // componentDidMount() {
   //   document.addEventListener("keydown", this.escFunction, false)
   // }
-
+$
   render(){
-    const channel_list = JSON.parse(localStorage.getItem('channel_list'))
+    const channel_list = this.props.ChannelList
+
+
+    if( channel_list === []){
+      console.log("empty channel")
+      return (
+        <div>
+        </div>
+      )
+    }
 
     return(
       <div

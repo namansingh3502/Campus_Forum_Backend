@@ -26,7 +26,7 @@ def posts_user(request):
     channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
     channel_list = list(map(lambda x: x[0], channel))
 
-    posts = Post.objects.filter(posted_in__in=channel_list, is_hidden=False).distinct()
+    posts = Post.objects.filter(posted_in__in=channel_list, is_hidden=False).distinct()[5:]
     post_id = list(posts.values_list('id'))
     post_id = list(map(lambda x: x[0], post_id))
 

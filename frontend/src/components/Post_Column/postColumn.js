@@ -25,6 +25,7 @@ export default class PostColumn extends Component {
         />
         <Posts />
         <PostCreateModal
+          ChannelList={this.props.ChannelList}
           updateNewPost={()=>{this.updateModalVisibility()}}
           ShowModal={this.state.showNewPostModal}
         />

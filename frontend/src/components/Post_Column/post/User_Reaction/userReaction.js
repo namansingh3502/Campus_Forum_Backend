@@ -10,8 +10,8 @@ export default class UserReaction extends Component {
       UserLiked: [],
       UserComments: [],
       PostLikeLoadStatus: "NotLoaded",
-      PostCommentsLoadStatus: "NotLoaded",
       PostLikeUpdateStatus: "NotLoaded",
+      PostCommentsLoadStatus: "NotLoaded",
       PostCommentsUpdateStatus: "NotLoaded",
     };
     this.loadLikes = this.loadLikes.bind(this);
@@ -21,19 +21,31 @@ export default class UserReaction extends Component {
 
   handleLike() {
     const post_id = this.props.post;
-    //const current_user = localStorage.getItem("user_id");
+    const current_user = parseInt(localStorage.getItem("user_id"));
 
     axios
-      .post(`http://localhost:8000/forum/${post_id}/like-post`,{}, {
-        headers: {
-          Authorization: localStorage.getItem("Token"),
-        },
+      .post(`http://localhost:8000/forum/${post_id}/like-post`,{},
+        {
+          headers: {
+            Authorization: localStorage.getItem("Token"),
+          },
       })
       .then((response) => {
         if (response.status === 200) {
+          let data = this.state.UserLiked
+
+          this.state.PostLiked ?
+            data.pop()
+          :
+            data.push({
+              username : localStorage.getItem('user_name'),
+              user_id : current_user
+            })
+
           this.setState({
             PostLikeUpdateStatus: "Loaded",
             PostLiked: !this.state.PostLiked,
+            UserLiked: data
           });
         } else {
           this.setState({
@@ -47,11 +59,8 @@ export default class UserReaction extends Component {
   }
 
   loadLikes() {
-    //Gets the list of user who liked the post.
-    //If current user has liked the post updates the post like status
-
     const post_id = this.props.post;
-    const current_user = localStorage.getItem("user_id");
+    const current_user = parseInt(localStorage.getItem("user_id"));
 
     axios
       .get(`http://localhost:8000/forum/${post_id}/likes`, {
@@ -65,8 +74,10 @@ export default class UserReaction extends Component {
           let liked = false;
 
           for (let i = 0; i < data.length; i++) {
-            if (parseInt(current_user) === data[i].user_id) {
+            if (current_user === data[i].user_id) {
               liked = true;
+              data.push(data[i])
+              data.splice(i,1)
             }
           }
           this.setState({
@@ -91,7 +102,7 @@ export default class UserReaction extends Component {
 
   render() {
     if (this.state.PostLikeLoadStatus !== "Loaded") {
-      return <>Loading</>;
+      return <div>Loading</div>;
     }
 
     return (
