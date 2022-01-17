@@ -186,7 +186,9 @@ $
                     />
                   </div>
                   <div className={"mx-auto"}>
-                    <button className="w-full bg-blue-400 mx-auto text-xl font-semibold rounded-md p-2">
+                    <button
+                      type={"submit"}
+                      className="w-full bg-blue-400 mx-auto text-xl font-semibold rounded-md p-2">
                       Post
                     </button>
                   </div>

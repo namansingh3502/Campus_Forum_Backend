@@ -1,21 +1,23 @@
 import { BrowserRouter } from "react-router-dom";
 import React, { StrictMode, Component } from "react";
 import { render } from "react-dom";
-
-import MenuColumn from "../components/Menu_Column/menuColumn";
-import PostColumn from "../components/Post_Column/postColumn";
-import ActivityColumn from "../components/activityColumn";
-import Header from "../components/header";
+import Login from "./login";
+import Forum from "../components/forum";
 import axios from "axios";
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      LoadUserStatus: false,
-      LoadChannelStatus: false,
-      ChannelList: []
+      UserLoggedIn: false,
     };
+    this.updateLoginStatus = this.updateLoginStatus.bind(this)
+  }
+
+  updateLoginStatus(){
+    this.setState({
+      UserLoggedIn: !this.state.UserLoggedIn
+    })
   }
 
   loadUserData() {
@@ -29,7 +31,7 @@ export default class App extends Component {
       .then((response) => {
         if (response.status === 200) {
           this.setState({
-              LoadUserStatus: true
+            UserLoggedIn: true
           })
           localStorage.setItem("user_id", response.data.id);
           localStorage.setItem("user_name", response.data.username);
@@ -43,56 +45,28 @@ export default class App extends Component {
       });
   }
 
-  loadChannelList() {
-    axios
-      .get("http://127.0.0.1:8000/forum/channel-list", {
-        headers: {
-          Authorization: localStorage.getItem("Token"),
-        },
-      })
-      .then((response) => {
-        if( response.status === 200) {
-          this.setState({
-            ChannelList: response.data,
-            LoadChannelStatus: true
-          })
-        } else {
-          console.log("some error happened while getting channel list")
-        }
-      })
-      .catch((error) => {
-        console.log("check login error", error);
-      });
-  }
-
   componentDidMount() {
-    this.loadUserData();
-    this.loadChannelList();
+    const token = localStorage.getItem('Token')
+    if(token){
+      this.loadUserData()
+    }
   }
 
   render() {
 
-    if( !this.state.LoadUserStatus && !this.state.LoadChannelStatus ){
+    if( this.state.UserLoggedIn ){
       return (
-        <div>
-          Loading
-        </div>
+        <Forum
+          updateLoginStatus={()=>{this.updateLoginStatus()}}
+        />
+      )
+    } else {
+      return(
+        <Login
+          updateLoginStatus={()=>{this.updateLoginStatus()}}
+        />
       )
     }
-    return (
-      <div className="min-h-screen">
-        <Header />
-        <div className="flex w-4/5 mx-auto mt-4 justify-center ">
-          <MenuColumn
-            ChannelList={this.state.ChannelList}
-          />
-          <PostColumn
-            ChannelList={this.state.ChannelList}
-          />
-          <ActivityColumn />
-        </div>
-      </div>
-    );
   }
 }
 
