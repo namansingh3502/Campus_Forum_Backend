@@ -160,7 +160,8 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:1234",
     "http://127.0.0.1:3000",
     "https://campus-forum-naman.herokuapp.com",
-    "https://forum-frontend-namansingh3502.vercel.app"
+    "https://forum-frontend-namansingh3502.vercel.app",
+    "https://forum-frontend-kui0h9hmh-namansingh3502.vercel.app"
 ]
 
 # Path to db routers
