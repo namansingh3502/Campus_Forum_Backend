@@ -4,3 +4,10 @@ django-rest-framework
 django-cors-headers
 
 djangorestframework~=3.13.1
+
+gunicorn
+asgiref
+pytz
+sqlparse
+whitenoise
+django_heroku

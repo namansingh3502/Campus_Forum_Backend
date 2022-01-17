@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import django_heroku
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +28,7 @@ SECRET_KEY = 'django-insecure-97g3h-p5h^a1y+y*@^6kmhw5sz-a^r9ms5r2ol7#cks5trthp&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','https://campus-forum-naman.herokuapp.com/']
 
 
 # Application definition
@@ -49,10 +51,11 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
 
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 
-    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -92,23 +95,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    'Forum': {
-        'ENGINE': 'djongo',
-        'NAME': 'FORUM',
-        'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': 'mongodb+srv://namansingh:msi2020@cluster0.vsnj4.mongodb.net/test?authSource=admin&replicaSet=atlas-9r9h9b-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true'
-        }
-    }
-}
-"""
 
 
 # Django-Rest framework config
@@ -173,6 +159,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:1234",
     "http://127.0.0.1:1234",
     "http://127.0.0.1:3000",
+    "https://campus-forum-naman.herokuapp.com"
 ]
 
 # Path to db routers
@@ -184,3 +171,4 @@ MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'AuthenticationApp.UserProfile'
 
+django_heroku.settings(locals())
