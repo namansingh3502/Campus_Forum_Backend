@@ -3,8 +3,6 @@ from django.db import models
 from django.utils import timezone
 from datetime import datetime
 from django.core.exceptions import ValidationError
-
-
 # Create your models here.
 
 class Channel(models.Model):
@@ -43,7 +41,7 @@ class Post(models.Model):
         Information related to posts.
     """
 
-    body = models.TextField("Post text", blank=True)
+    body = models.TextField("Post text", blank=False, null=False)
     time = models.DateTimeField(blank=False, auto_now=True)
     media_count = models.PositiveSmallIntegerField("Media count",default=0, blank=False);
 
@@ -97,7 +95,7 @@ class Post_Comment(models.Model):
         on_delete=models.CASCADE
     )
 
-    body = models.TextField("Comment", blank=False)
+    body = models.TextField("Comment", blank=False, null=False)
     time = models.DateTimeField(auto_now=True)
     is_hidden = models.BooleanField(
         'Is Hidden',
