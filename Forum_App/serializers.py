@@ -1,5 +1,29 @@
 from rest_framework import serializers
 from .models import *
+from AuthenticationApp.models import *
+
+
+class UserDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'id',
+            'username'
+        ]
+
+
+class ChannelDetailsSerializer(serializers.ModelSerializer):
+
+    admin = UserDetailsSerializer('admin')
+
+    class Meta:
+        model = Channel
+        fields = [
+            'id',
+            'name',
+            'admin',
+        ]
 
 
 class PostChannelSerializer(serializers.ModelSerializer):

@@ -131,7 +131,6 @@ class Media(models.Model):
     def __str__(self):
         return self.pk
 
-
 class User_Post_Media(models.Model):
 
     user = models.ForeignKey(

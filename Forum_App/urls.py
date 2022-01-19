@@ -25,4 +25,6 @@ urlpatterns = [
     path('<int:post_id>/comments', views.post_comment, name="Post-Comments"),
     path('<int:post_id>/likes', views.post_likes, name="Post-Likes"),
     path('<int:post_id>/like-post', views.update_post_like, name="Update-Post-Like"),
+    path('channel/<int:channel_id>/posts', views.channel_post, name="Channel-Post"),
+    path('channel/<int:channel_id>', views.channel_details, name="Channel-Details"),
 ]

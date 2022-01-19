@@ -56,6 +56,43 @@ def post_likes(request, post_id):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def channel_details(request, channel_id):
+
+    try:
+        data = Channel.objects.get(id=channel_id)
+    except Channel.DoesNotExist:
+        return Response({'msg':'Channel does not exist'}, status=400)
+
+    serializer = ChannelDetailsSerializer(data)
+
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def channel_post(request, channel_id):
+
+    channel = Channel.objects.get(id=channel_id)
+    member_of = UserProfile.objects.get(user=request.user.pk).member_of.all()
+
+    if channel not in member_of:
+        return Response({'msg':'Not a member of channel'}, status=400)
+
+    if( not channel.is_active ):
+        return Response({'msg':'Channel not active'}, status=400)
+
+    posts = Post.objects.filter(posted_in=channel_id, is_hidden=False).distinct()
+    post_id = list(posts.values_list('id'))
+    post_id = list(map(lambda x: x[0], post_id))
+
+    data = User_Post_Media.objects.filter(post__in=post_id).order_by('-pk')
+    serializer = PostSerializer(data, many=True)
+
+    return Response(serializer.data)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_post_like(request, post_id):
