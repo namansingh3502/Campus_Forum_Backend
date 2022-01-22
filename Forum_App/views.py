@@ -75,7 +75,7 @@ def channel_details(request, channel_id):
 def channel_post(request, channel_id):
 
     channel = Channel.objects.get(id=channel_id)
-    member_of = UserProfile.objects.get(user=request.user.pk).member_of.all()
+    member_of = UserProfile.objects.get(id=request.user.pk).member_of.all()
 
     if channel not in member_of:
         return Response({'msg':'Not a member of channel'}, status=400)
@@ -123,16 +123,18 @@ def new_post(request):
 
     postForm = PostForm(data)
 
+    print(data)
+
     if postForm.is_valid():
-        Post = Post.objects.create(
-            body = data['text'],
+        post = Post.objects.create(
+            body = data['body'],
             media_count = data['media_count']
         )
-        Post.save()
+        post.save()
         for channel in data['channel_list']:
             try:
                 channel = Channel.objects.get(id=channel['id'])
-                Post.posted_in.add(channel)
+                post.posted_in.add(channel)
             except Channel.DoesNotExist:
                 return Response(status=400)
 

@@ -16,6 +16,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 class ChannelDetailsSerializer(serializers.ModelSerializer):
 
     admin = UserDetailsSerializer('admin')
+    member_count = serializers.IntegerField(source='userprofile_set.count', read_only=True)
 
     class Meta:
         model = Channel
@@ -23,6 +24,7 @@ class ChannelDetailsSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'admin',
+            'member_count'
         ]
 
 
