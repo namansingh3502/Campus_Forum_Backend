@@ -1,5 +1,31 @@
 from rest_framework import serializers
 from .models import *
+from AuthenticationApp.models import *
+
+
+class UserDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'id',
+            'username'
+        ]
+
+
+class ChannelDetailsSerializer(serializers.ModelSerializer):
+
+    admin = UserDetailsSerializer('admin')
+    member_count = serializers.IntegerField(source='userprofile_set.count', read_only=True)
+
+    class Meta:
+        model = Channel
+        fields = [
+            'id',
+            'name',
+            'admin',
+            'member_count'
+        ]
 
 
 class PostChannelSerializer(serializers.ModelSerializer):
@@ -44,7 +70,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post_Comment
-        fields = ('post', 'username', 'datetime', 'body')
+        fields = ('id', 'username', 'time', 'body')
 
 
 class LikeSerializer(serializers.ModelSerializer):
