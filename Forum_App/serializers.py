@@ -9,7 +9,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = [
             'id',
-            'username'
+            'username',
+            'user_image'
         ]
 
 
@@ -38,8 +39,17 @@ class PostChannelSerializer(serializers.ModelSerializer):
         ]
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user', read_only=True)
+
+    class Meta:
+        model = Post_Like
+        fields = ('username', 'user_id')
+
+
 class PostDataSerializer(serializers.ModelSerializer):
-    channel_name = PostChannelSerializer(source='posted_in', many=True)
+    posted_in = PostChannelSerializer(many=True)
+    Liked_Post = LikeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
@@ -48,37 +58,30 @@ class PostDataSerializer(serializers.ModelSerializer):
             'body',
             'time',
             'media_count',
-            'channel_name'
+            'posted_in',
+            'Liked_Post'
         ]
 
 
 class PostSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
-    post_data = PostDataSerializer(source='post')
+    user = UserDetailsSerializer(read_only=True)
+    post = PostDataSerializer(read_only=True)
 
     class Meta:
         model = User_Post_Media
         fields = [
-            'user_id',
-            'username',
-            'post_data'
+            'user',
+            'post',
+            'media',
         ]
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user', read_only=True)
+    user = UserDetailsSerializer(read_only=True)
 
     class Meta:
         model = Post_Comment
-        fields = ('id', 'username', 'time', 'body')
-
-
-class LikeSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user', read_only=True)
-
-    class Meta:
-        model = Post_Like
-        fields = ('username', 'user_id')
+        fields = ('id', 'user', 'time', 'body')
 
 
 class ChannelListSerializer(serializers.ModelSerializer):
