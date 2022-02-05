@@ -25,7 +25,7 @@ def posts_user(request):
     channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
     channel_list = list(map(lambda x: x[0], channel))
 
-    posts = Post.objects.filter(posted_in__in=channel_list, is_hidden=False).distinct()
+    posts = Post.objects.filter(posted_in__in=channel_list, is_hidden=False).distinct()[:10]
     post_id = list(posts.values_list('id'))
     post_id = list(map(lambda x: x[0], post_id))
 
@@ -40,7 +40,7 @@ def posts_user(request):
 @permission_classes([IsAuthenticated])
 def post_comment(request, post_id):
 
-    comments = Post_Comment.objects.filter(post=post_id).order_by('-pk')
+    comments = Post_Comment.objects.filter(post=post_id).order_by('pk')
     serializer = CommentSerializer(comments, many=True)
 
     return Response(serializer.data)
@@ -83,7 +83,7 @@ def channel_post(request, channel_id):
     if( not channel.is_active ):
         return Response({'msg':'Channel not active'}, status=400)
 
-    posts = Post.objects.filter(posted_in=channel_id, is_hidden=False).distinct()
+    posts = Post.objects.filter(posted_in=channel_id, is_hidden=False).distinct()[:10]
     post_id = list(posts.values_list('id'))
     post_id = list(map(lambda x: x[0], post_id))
 
@@ -123,8 +123,6 @@ def new_post(request):
 
     postForm = PostForm(data)
 
-    print(data)
-
     if postForm.is_valid():
         post = Post.objects.create(
             body = data['body'],
@@ -144,26 +142,35 @@ def new_post(request):
         )
     else:
         return Response(status=400)
+    data = User_Post_Media.objects.get(post_id=post)
+    serializer = PostSerializer(data)
 
-    return Response({'msg':'post created succesfully'})
+    return Response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def new_comment(request):
 
     data = json.loads(request.body)
-    print(data)
 
-    commentForm = CommentForm(data)
+    try:
+        post = Post.objects.get(id=data['post'])
+        commentForm = CommentForm(data)
 
-    if commentForm.is_valid():
-        Comment = Post_Comment.objects.create(
-            user_id=request.user.pk,
-            post_id=data['post'],
-            body=data['body']
-        )
-        Comment.save()
-    else:
+        if commentForm.is_valid():
+            comment = Post_Comment.objects.create(
+                user_id=request.user.pk,
+                post_id=data['post'],
+                body=data['body']
+            )
+            comment.save()
+        else:
+            return Response(status=400)
+    except Post.DoesNotExist:
         return Response(status=400)
 
-    return Response({'msg':'Comment created successfull'})
+    comments = Post_Comment.objects.get(id=comment.pk)
+    serializer = CommentSerializer(comments)
+
+    return Response(serializer.data)
