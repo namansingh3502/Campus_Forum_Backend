@@ -118,7 +118,25 @@ def update_post_like(request, post_id):
 def new_post(request):
     data = json.loads(request.body)
 
+    "check if channel list is empty"
+
     if data['channel_list'] == []:
+        return Response(status=400)
+
+    "check if user is member of all channels"
+
+    user_channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
+    channel_member_list = list(map(lambda x: x[0], user_channel))
+
+    post_channel_list = list(map(lambda x : x['id'], data['channel_list']))
+
+    """ 
+        all( channel in channel_member_list for channel in post_channel_list )
+        above function does somthing similar
+        https://stackoverflow.com/questions/16579085/how-can-i-verify-if-one-list-is-a-subset-of-another
+    """
+
+    if not set(post_channel_list).issubset(set(channel_member_list)) :
         return Response(status=400)
 
     postForm = PostForm(data)
@@ -140,6 +158,58 @@ def new_post(request):
             user_id=request.user.pk,
             post_id=post.pk
         )
+    else:
+        return Response(status=400)
+    data = User_Post_Media.objects.get(post_id=post)
+    serializer = PostSerializer(data)
+
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def edit_post(request):
+    data = json.loads(request.body)
+
+    "check if channel list is empty"
+
+    if data['channel_list'] == []:
+        return Response(status=400)
+
+    "check if user is member of all channels"
+
+    user_channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
+    channel_member_list = set(map(lambda x: x[0], user_channel))
+
+    post_channel_list = set(map(lambda x : x['id'], data['channel_list']))
+
+    """ 
+        all( channel in channel_member_list for channel in post_channel_list )
+        above function does somthing similar
+        https://stackoverflow.com/questions/16579085/how-can-i-verify-if-one-list-is-a-subset-of-another
+    """
+
+    if not post_channel_list.issubset(channel_member_list) :
+        return Response(status=400)
+
+    postForm = PostForm(data)
+
+    if postForm.is_valid():
+        post = Post.objects.get(pk=data['post_id'])
+        post.body = data['body']
+        post.save()
+
+        old_post_channel_list = set(map(lambda x: x[0], post.posted_in.all().values_list('id')))
+
+        added_channels = post_channel_list.difference(old_post_channel_list)
+        removed_channels = old_post_channel_list.difference(post_channel_list)
+
+        for channel_id in added_channels :
+            post.posted_in.add(Channel.objects.get(id=channel_id))
+
+        for channel_id in removed_channels:
+            post.posted_in.remove(Channel.objects.get(id=channel_id))
+
     else:
         return Response(status=400)
     data = User_Post_Media.objects.get(post_id=post)

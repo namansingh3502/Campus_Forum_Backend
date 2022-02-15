@@ -26,3 +26,4 @@ venv
 *.pyc
 staticfiles
 .env
+/media/userimage/
