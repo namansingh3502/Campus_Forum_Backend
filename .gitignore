@@ -27,3 +27,4 @@ venv
 staticfiles
 .env
 /media/userimage/
+/media/postimages/

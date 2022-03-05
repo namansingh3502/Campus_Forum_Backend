@@ -1,8 +1,9 @@
+from django.http.response import HttpResponse
+from django.middleware.csrf import get_token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from .models import UserProfile
+
 from .serializers import *
 
 # Create your views here.
@@ -16,3 +17,11 @@ def user_profile(request):
     serializer = UserProfileSerializer(user)
 
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def csrf_token_generator(request):
+    csrf_token = get_token(request)
+
+    return HttpResponse(csrf_token)
