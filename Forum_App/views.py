@@ -190,6 +190,13 @@ def new_post(request):
                 default_storage.delete(file.name)
                 index += 1
 
+                userPostMedia = User_Post_Media.objects.create(
+                    user_id=request.user.pk,
+                    post_id=post.pk,
+                    media_id=media.pk
+                )
+
+
             except Exception as e:
                 post.delete()
                 userPostMedia.delete()
@@ -197,11 +204,6 @@ def new_post(request):
 
             #TODO: create custom signal for storing and updating userPostMedia data
 
-            userPostMedia = User_Post_Media.objects.create(
-                user_id=request.user.pk,
-                post_id=post.pk,
-                media_id=media.pk
-            )
 
         serializer = PostSerializer(post)
         return Response(serializer.data)
