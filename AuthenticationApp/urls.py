@@ -22,5 +22,5 @@ urlpatterns = [
     path('', include('djoser.urls')),
     path('', include('djoser.urls.authtoken')),
     path('user/', views.user_profile, name="Basic_User" ),
-
+    path('csrf/', views.csrf_token_generator, name="CSRF-Token")
 ]

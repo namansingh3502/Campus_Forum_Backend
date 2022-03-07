@@ -63,17 +63,44 @@ class PostDataSerializer(serializers.ModelSerializer):
         ]
 
 
-class PostSerializer(serializers.ModelSerializer):
-    user = UserDetailsSerializer(read_only=True)
-    post = PostDataSerializer(read_only=True)
+class MediaDataSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = User_Post_Media
+        model = Media
+        fields = ('file',)
+
+
+class PostSerializer(serializers.Serializer):
+    user = serializers.SerializerMethodField("getUser")
+    post = serializers.SerializerMethodField("getPost")
+    media = serializers.SerializerMethodField("getMedia")
+
+    class Meta:
         fields = [
             'user',
             'post',
             'media',
         ]
+
+    def getUser(self, post):
+        user = post.Post.all()[0].user
+        serializers = UserDetailsSerializer(user)
+        return serializers.data
+
+    def getPost(self, post):
+        serializers = PostDataSerializer(post)
+        return serializers.data
+
+
+    def getMedia(self, post):
+        media_file = post.Post.filter(media_id__isnull = False).order_by('pk')
+
+        media_list=[]
+        if media_file :
+            media_list = list(map(lambda x: x.media, media_file))
+
+        serializer = MediaDataSerializer(media_list, many=True)
+        return serializer.data
 
 
 class CommentSerializer(serializers.ModelSerializer):

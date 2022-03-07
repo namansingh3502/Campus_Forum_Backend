@@ -11,3 +11,4 @@ pytz
 sqlparse
 whitenoise
 django_heroku
+Pyrebase~=3.0.27

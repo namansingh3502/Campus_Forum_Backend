@@ -48,7 +48,7 @@ class UserProfile(AbstractUser):
     prefix = models.CharField(
         "Prefix",
         choices=PREFIX,
-        max_length=4,
+        max_length=4
     )
 
     middle_name = models.CharField("Middle Name", max_length=150, blank=True)
@@ -58,16 +58,16 @@ class UserProfile(AbstractUser):
     department = models.CharField(
         "Department",
         choices=DEPARTMENT,
-        max_length=5,
+        max_length=5
     )
     user_image = models.FileField(
         "User Image",
-        upload_to=path_and_rename,
+        upload_to=path_and_rename
     )
 
     member_of = models.ManyToManyField(
-        "Forum_App.Channel",
-        verbose_name="Channel Member",
+        to="Forum_App.Channel",
+        verbose_name="Channel Member"
     )
 
 

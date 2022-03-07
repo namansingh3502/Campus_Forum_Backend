@@ -26,12 +26,12 @@ class Channel(models.Model):
     )
 
     moderator = models.ManyToManyField(
-        'AuthenticationApp.UserProfile',
+        to='AuthenticationApp.UserProfile',
         related_name="Moderator"
     )
 
     class Meta:
-        unique_together = ('name', 'admin',)
+        unique_together = ('name', 'admin')
 
     def __str__(self):
         return self.name
@@ -43,7 +43,7 @@ class Post(models.Model):
 
     body = models.TextField("Post text", blank=False, null=False)
     time = models.DateTimeField(blank=False, auto_now=True)
-    media_count = models.PositiveSmallIntegerField("Media count",default=0, blank=False);
+    media_count = models.PositiveSmallIntegerField("Media count",default=0, blank=False, null=False);
 
     is_hidden = models.BooleanField(
         'Is Hidden',
@@ -54,8 +54,8 @@ class Post(models.Model):
     )
 
     posted_in = models.ManyToManyField(
-        "Channel",
-        related_name="Post_Channel",
+        to="Channel",
+        related_name="Post_Channel"
     )
 
     def __str__(self):
@@ -110,26 +110,17 @@ class Post_Comment(models.Model):
 
 class Media(models.Model):
 
-    def path_and_rename(instance):
-        path = "postimages/"
-        filename = now.strftime("%d_%m_%Y__%H_%M_%S")
-        file_extension = filename.split('.')[-1]
-        format = str(instance) + "_" + filename + '.' + file_extension
-        return os.path.join(path, format)
-
-    file_name = models.FileField(
-        "Media file",
-        upload_to=path_and_rename,
+    file = models.URLField(
+        "File Path",
     )
 
     file_type = models.CharField(
         "File Type ",
-        default="image",
-        max_length=5
+        max_length=10
     )
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
 class User_Post_Media(models.Model):
 
