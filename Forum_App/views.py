@@ -166,6 +166,7 @@ def new_post(request):
             file_extension = file.name.split('.')[-1]
             file.name = "media_" + str(index) + '.' + file_extension
 
+
             try:
                 default_storage.save("postFiles/" + file.name, file)
 
@@ -178,7 +179,7 @@ def new_post(request):
                 fileURL = firebaseStorage.child(
                         "postFiles/post_" + str(post.pk) + "/" + file.name
                     ).get_url(
-                    token="9bb2e73f-6b9a-42a1-bef9-78e1794c2a3f"
+                        token="9bb2e73f-6b9a-42a1-bef9-78e1794c2a3f"
                     )
 
                 media = Media.objects.create(
@@ -196,14 +197,12 @@ def new_post(request):
                     media_id=media.pk
                 )
 
-
             except Exception as e:
                 post.delete()
                 userPostMedia.delete()
                 print("exception ", e)
 
-            #TODO: create custom signal for storing and updating userPostMedia data
-
+        #TODO: create custom signal for storing and updating userPostMedia data
 
         serializer = PostSerializer(post)
         return Response(serializer.data)
