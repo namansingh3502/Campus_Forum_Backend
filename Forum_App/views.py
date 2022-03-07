@@ -2,12 +2,16 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from django.core.files.storage import default_storage
 import json
 
 from AuthenticationApp.models import *
 from .models import *
 from .serializers import *
 from .forms import *
+
+from .firebaseConfig import storage as firebaseStorage
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -160,17 +164,38 @@ def new_post(request):
         for file in request.FILES:
             file = request.FILES[file]
             file_extension = file.name.split('.')[-1]
+            file.name = "media_" + str(index) + '.' + file_extension
 
-            file.name = str(post.pk) + "_media_" + str(index) + '.' + file_extension
-            index += 1
+            try:
+                default_storage.save("postFiles/" + file.name, file)
 
-            media = Media.objects.create(
-                file=file,
-                file_type=str(file.content_type)
-            )
-            media.save()
+                firebaseStorage.child(
+                        "postFiles/post_" + str(post.pk) + "/" + file.name
+                    ).put(
+                        "media/" + "postFiles/" + file.name
+                    )
 
-            #TODO: create custom signal for storing and updating userPOstMedia data
+                fileURL = firebaseStorage.child(
+                        "postFiles/post_" + str(post.pk) + "/" + file.name
+                    ).get_url(
+                    token="9bb2e73f-6b9a-42a1-bef9-78e1794c2a3f"
+                    )
+
+                media = Media.objects.create(
+                    file=fileURL,
+                    file_type=str(file.content_type)
+                )
+                media.save()
+
+                default_storage.delete(file.name)
+                index += 1
+
+            except Exception as e:
+                post.delete()
+                userPostMedia.delete()
+                print("exception ", e)
+
+            #TODO: create custom signal for storing and updating userPostMedia data
 
             userPostMedia = User_Post_Media.objects.create(
                 user_id=request.user.pk,

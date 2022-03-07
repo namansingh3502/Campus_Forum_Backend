@@ -110,14 +110,12 @@ class Post_Comment(models.Model):
 
 class Media(models.Model):
 
-    file = models.FileField(
-        "File ",
-        upload_to="postFiles/"
+    file = models.URLField(
+        "File Path",
     )
 
     file_type = models.CharField(
         "File Type ",
-        default="image",
         max_length=10
     )
 
