@@ -37,16 +37,17 @@ class PostAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Post Details', {
-            'fields': ('body', 'posted_in', 'is_hidden')
+            'fields': ('body', 'posted_in')
         }),
         ('Additional Details', {
             'fields': ('time', 'media_count')
+        }),
+        ('Visibility', {
+            'fields': ('is_hidden',)
         })
     )
 
-    readonly_fields = ('time', 'media_count')
-
-    filter_horizontal = ('posted_in',)
+    readonly_fields = ('time', 'media_count', 'posted_in', 'body')
 
 
 @admin.register(Post_Comment)
@@ -88,7 +89,7 @@ class PostLikeAdmin(admin.ModelAdmin):
         }),
     )
 
-    readonly_fields = ('time',)
+    readonly_fields = ('time', 'user', 'post')
 
 
 @admin.register(User_Post_Media)
@@ -101,3 +102,5 @@ class UserPostMedia(admin.ModelAdmin):
             'fields': ('user', 'post', 'media')
         }),
     )
+
+    readonly_fields = ('user', 'post', 'media')
