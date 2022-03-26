@@ -21,6 +21,7 @@ from . import views
 urlpatterns = [
     path('', include('djoser.urls')),
     path('', include('djoser.urls.authtoken')),
-    path('user/', views.user_profile, name="Basic_User" ),
+    path('user/', views.user_profile, name="Basic-User-Details" ),
+    path('update/user_image', views.update_user_image, name="Update-User-Image"),
     path('csrf/', views.csrf_token_generator, name="CSRF-Token")
 ]

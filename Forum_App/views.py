@@ -1,23 +1,20 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from django.core.files.storage import default_storage
 import json
 
-from AuthenticationApp.models import *
-from .models import *
 from .serializers import *
 from .forms import *
 
-from .firebaseConfig import storage as firebaseStorage
+from firebaseConfig import storage as firebaseStorage
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def channels(request):
 
-    channel_list = UserProfile.objects.get(pk=request.user.pk).member_of.filter(is_active=True)
+    channel_list = UserProfile.objects.get(pk=request.user.pk).channel_set.filter(is_active=True)
     serializer = ChannelListSerializer(channel_list, many=True)
 
     return Response(serializer.data)
@@ -26,7 +23,7 @@ def channels(request):
 @permission_classes([IsAuthenticated])
 def posts_user(request):
 
-    channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
+    channel = list(UserProfile.objects.get(pk=request.user.pk).channel_set.all().values_list('id'))
     post_id = Post.objects.filter(posted_in__in=channel, is_hidden=False).order_by('-pk').distinct()[:10]
     serializer = PostSerializer(post_id, many=True)
 
@@ -72,7 +69,7 @@ def channel_details(request, channel_id):
 def channel_post(request, channel_id):
 
     channel = Channel.objects.get(id=channel_id)
-    member_of = UserProfile.objects.get(id=request.user.pk).member_of.all()
+    member_of = UserProfile.objects.get(id=request.user.pk).channel_set.all()
 
     if channel not in member_of:
         return Response({'msg':'Not a member of channel'}, status=401)
@@ -118,7 +115,7 @@ def new_post(request):
 
     #check if user is member of all channels
 
-    user_channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
+    user_channel = list(UserProfile.objects.get(pk=request.user.pk).channel_set.all().values_list('id'))
     channel_member_list = list(map(lambda x: x[0], user_channel))
 
     post_channel_list = list(map(lambda x : x['id'], data['channel_list']))
@@ -188,7 +185,7 @@ def new_post(request):
                 )
                 media.save()
 
-                default_storage.delete(file.name)
+                default_storage.delete("postFiles/" + file.name)
                 index += 1
 
                 userPostMedia = User_Post_Media.objects.create(
@@ -225,7 +222,7 @@ def edit_post(request):
 
     "check if user is member of all channels"
 
-    user_channel = list(UserProfile.objects.get(pk=request.user.pk).member_of.all().values_list('id'))
+    user_channel = list(UserProfile.objects.get(pk=request.user.pk).channel_set.all().values_list('id'))
     channel_member_list = set(map(lambda x: x[0], user_channel))
 
     post_channel_list = set(map(lambda x : x['id'], data['channel_list']))

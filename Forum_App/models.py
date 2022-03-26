@@ -25,6 +25,11 @@ class Channel(models.Model):
         related_name='Channel_Admin'
     )
 
+    member_of = models.ManyToManyField(
+        to="AuthenticationApp.UserProfile",
+        verbose_name="Channel Member"
+    )
+
     moderator = models.ManyToManyField(
         to='AuthenticationApp.UserProfile',
         related_name="Moderator"

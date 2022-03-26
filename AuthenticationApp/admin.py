@@ -21,7 +21,6 @@ class User_Profile_Admin(UserAdmin):
                 'department',
                 'email',
                 'phone',
-                'user_image',
             )
         }),
         ('Permissions', {
@@ -29,7 +28,6 @@ class User_Profile_Admin(UserAdmin):
                 'is_active',
                 'is_staff',
                 'is_superuser',
-                'member_of',
                 'groups',
                 'user_permissions'
             )
@@ -66,12 +64,11 @@ class User_Profile_Admin(UserAdmin):
                 'is_active',
                 'is_staff',
                 'is_superuser',
-                'member_of',
                 'groups',
                 'user_permissions'
             )
         }),
     )
 
-    filter_horizontal = ('member_of','groups','user_permissions')
+    filter_horizontal = ('groups','user_permissions')
 

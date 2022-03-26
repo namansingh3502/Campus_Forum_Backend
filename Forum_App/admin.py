@@ -15,9 +15,12 @@ class ChannelAdmin(admin.ModelAdmin):
         ('Channel Details', {
             'fields': ('name', 'admin', 'is_active', 'moderator')
         }),
+        ('Channel Member', {
+            'fields': ('member_of',)
+        }),
     )
 
-    filter_horizontal = ('moderator',)
+    filter_horizontal = ('moderator', 'member_of')
 
 
 @admin.register(Post)
