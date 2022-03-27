@@ -38,13 +38,6 @@ class UserProfile(AbstractUser):
         ('F', 'FEMALE')
     )
 
-    def path_and_rename(instance, filename):
-        path = "userimage/"
-        file_extension = filename.split('.')[-1]
-        format = instance.username + '.' + file_extension
-        return os.path.join(path, format)
-
-
     prefix = models.CharField(
         "Prefix",
         choices=PREFIX,
@@ -60,16 +53,10 @@ class UserProfile(AbstractUser):
         choices=DEPARTMENT,
         max_length=5
     )
-    user_image = models.FileField(
-        "User Image",
-        upload_to=path_and_rename
+    user_image = models.URLField(
+        "User Image Path",
+        default="https://firebasestorage.googleapis.com/v0/b/forum-image-storage.appspot.com/o/userImage%2Fdefault.jpeg?alt=media&token=e45a56e3-2b3e-4d8c-a905-20c8db1c2dc1"
     )
-
-    member_of = models.ManyToManyField(
-        to="Forum_App.Channel",
-        verbose_name="Channel Member"
-    )
-
 
     def __str__(self):
         return self.username
