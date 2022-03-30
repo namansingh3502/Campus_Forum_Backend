@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from django.core.files.storage import default_storage
 import json
 
+from .signals import media_saved
 from .serializers import *
 from .forms import *
 
@@ -24,7 +25,7 @@ def channels(request):
 def posts_user(request):
 
     channel = list(UserProfile.objects.get(pk=request.user.pk).channel_set.all().values_list('id'))
-    post_id = Post.objects.filter(posted_in__in=channel, is_hidden=False).order_by('-pk').distinct()[:10]
+    post_id = Post.objects.filter(posted_in__in=channel, is_hidden=False).order_by('-pk').distinct()
     serializer = PostSerializer(post_id, many=True)
 
     return Response(serializer.data)
@@ -77,7 +78,7 @@ def channel_post(request, channel_id):
     if not channel.is_active:
         return Response({'msg':'Channel not active'}, status=403)
 
-    post_id = Post.objects.filter(posted_in=channel_id, is_hidden=False).order_by('-pk').distinct()[:10]
+    post_id = Post.objects.filter(posted_in=channel_id, is_hidden=False).order_by('-pk').distinct()
     serializer = PostSerializer(post_id, many=True)
 
     return Response(serializer.data)
@@ -141,6 +142,10 @@ def new_post(request):
         )
         post.save()
 
+        # post_saved signal creates user_post_media instance
+
+        # post_saved.send(sender="create post", user=request.user.pk, post=post.pk, media=None)
+
         #Adding Channels to the post
 
         for channel in data['channel_list']:
@@ -151,11 +156,6 @@ def new_post(request):
                 return Response(status=400)
 
         #Storing Files in storage and path in db
-
-        userPostMedia = User_Post_Media.objects.create(
-            user_id=request.user.pk,
-            post_id=post.pk,
-        )
 
         index = 0
         for file in request.FILES:
@@ -188,18 +188,13 @@ def new_post(request):
                 default_storage.delete("postFiles/" + file.name)
                 index += 1
 
-                userPostMedia = User_Post_Media.objects.create(
-                    user_id=request.user.pk,
-                    post_id=post.pk,
-                    media_id=media.pk
-                )
+                #media_saved signal creates user_post_media instance
+
+                media_saved.send(sender="create post", user=request.user.pk, post=post.pk, media=media.pk)
 
             except Exception as e:
                 post.delete()
-                userPostMedia.delete()
                 print("exception ", e)
-
-        #TODO: create custom signal for storing and updating userPostMedia data
 
         serializer = PostSerializer(post)
         return Response(serializer.data)

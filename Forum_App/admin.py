@@ -16,11 +16,11 @@ class ChannelAdmin(admin.ModelAdmin):
             'fields': ('name', 'admin', 'is_active', 'moderator')
         }),
         ('Channel Member', {
-            'fields': ('member_of',)
+            'fields': ('members',)
         }),
     )
 
-    filter_horizontal = ('moderator', 'member_of')
+    filter_horizontal = ('moderator', 'members')
 
 
 @admin.register(Post)
@@ -98,7 +98,7 @@ class PostLikeAdmin(admin.ModelAdmin):
 @admin.register(User_Post_Media)
 class UserPostMedia(admin.ModelAdmin):
 
-    list_display = ('user', 'post')
+    list_display = ('user', 'post', 'media')
 
     fieldsets = (
         ('User Post Details ', {
