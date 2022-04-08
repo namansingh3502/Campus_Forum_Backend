@@ -21,7 +21,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 class ChannelDetailsSerializer(serializers.ModelSerializer):
 
     admin = UserDetailsSerializer('admin')
-    member_count = serializers.IntegerField(source='userprofile_set.count', read_only=True)
+    member_count = serializers.IntegerField(source='members.count', read_only=True)
 
     class Meta:
         model = Channel
@@ -48,12 +48,17 @@ class LikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post_Like
-        fields = ('username', 'user_id')
+        fields = [
+            'username',
+            'user_id',
+        ]
 
 
 class PostDataSerializer(serializers.ModelSerializer):
     posted_in = PostChannelSerializer(many=True)
-    Liked_Post = LikeSerializer(many=True, read_only=True)
+    likes = serializers.SerializerMethodField("getLikes")
+    comments_count = serializers.SerializerMethodField("getCommentCount")
+
 
     class Meta:
         model = Post
@@ -63,9 +68,18 @@ class PostDataSerializer(serializers.ModelSerializer):
             'time',
             'media_count',
             'posted_in',
-            'Liked_Post'
+            'likes',
+            'comments_count'
         ]
 
+    def getCommentCount(self, post):
+        count = post.Commented_Post.count()
+        return count
+
+    def getLikes(self, post):
+        likes = Post_Like.objects.filter(pk=post.pk).all()
+        serializer = LikeSerializer( likes, many=True)
+        return serializer.data
 
 class MediaDataSerializer(serializers.ModelSerializer):
 
