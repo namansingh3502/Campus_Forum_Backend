@@ -1,14 +1,14 @@
 from django.forms import ModelForm
-from .models import Post, Post_Comment
+from .models import Post, PostComments
 
 
 class PostForm(ModelForm):
     class Meta:
         model = Post
-        fields = ['body', 'media_count']
+        fields = ['body']
 
 
 class CommentForm(ModelForm):
     class Meta:
-        model = Post_Comment
+        model = PostComments
         fields = ['body', 'post']

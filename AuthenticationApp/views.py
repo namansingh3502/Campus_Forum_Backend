@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .serializers import *
+from .models import *
 from firebaseConfig import storage as firebaseStorage
 
 

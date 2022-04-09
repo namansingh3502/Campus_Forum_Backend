@@ -1,9 +1,6 @@
-import os
 from django.db import models
-from django.utils import timezone
-from datetime import datetime
-from django.core.exceptions import ValidationError
-# Create your models here.
+from django.utils.translation import gettext_lazy as _
+
 
 class Channel(models.Model):
     """
@@ -11,44 +8,47 @@ class Channel(models.Model):
     All fields are required.
     """
 
-    name = models.CharField("Channel Name", max_length=50, blank=False, null=False, unique=True)
+    name = models.CharField(_("Channel Name"), max_length=50, blank=False, null=False, unique=True)
     is_active = models.BooleanField(
-        'Is active',
+        _('Is active'),
         default=True,
         help_text=
-            'Designates whether this channel should be treated as active. '
-            'Unselect this instead of deleting channels.'
+        _('Designates whether this channel should be treated as active. '
+          'Unselect this instead of deleting channels.'),
+        null=False,
+        blank=False
     )
     admin = models.ForeignKey(
         'AuthenticationApp.UserProfile',
         on_delete=models.CASCADE,
         related_name='Channel_Admin'
     )
-
     members = models.ManyToManyField(
         to="AuthenticationApp.UserProfile",
-        verbose_name="Channel Member"
+        verbose_name=_("Channel Member")
     )
-
     moderator = models.ManyToManyField(
         to='AuthenticationApp.UserProfile',
-        related_name="Moderator"
+        related_name=_("Moderator")
     )
 
     class Meta:
+        db_table = "channel"
+        verbose_name = _("channel")
+        verbose_name_plural = _("channels")
         unique_together = ('name', 'admin')
 
     def __str__(self):
         return self.name
 
+
 class Post(models.Model):
     """
-        Information related to posts.
+        Information related to post.
     """
 
     body = models.TextField("Post text", blank=False, null=False)
     time = models.DateTimeField(blank=False, auto_now=True)
-    media_count = models.PositiveSmallIntegerField("Media count",default=0, blank=False, null=False);
 
     is_hidden = models.BooleanField(
         'Is Hidden',
@@ -63,37 +63,43 @@ class Post(models.Model):
         related_name="Post_Channel"
     )
 
+    class Meta:
+        db_table = "post"
+        verbose_name = _("post")
+        verbose_name_plural = _("posts")
+
     def __str__(self):
-        return "Post-Id : " + str(self.pk)
+        return "Post-Id : %s" % self.pk
 
-class Post_Like(models.Model):
 
+class PostLikes(models.Model):
     user = models.ForeignKey(
         'AuthenticationApp.UserProfile',
-        related_name='User_liked',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='User_Liked'
     )
-
     post = models.ForeignKey(
         'Post',
-        related_name='Liked_Post',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='Liked_Post'
     )
-    time = models.DateTimeField(auto_now=True)
 
     class Meta:
+        db_table = "post_likes"
+        verbose_name = _("like")
+        verbose_name_plural = _("likes")
         unique_together = ('user', 'post')
 
     def __str__(self):
-        return str(self.user) + " " + str(self.post)
+        return "%s %s" % (self.user, self.post)
 
-class Post_Comment(models.Model):
+
+class PostComments(models.Model):
     user = models.ForeignKey(
         'AuthenticationApp.UserProfile',
         related_name='User_Commented',
         on_delete=models.CASCADE
     )
-
     post = models.ForeignKey(
         'Post',
         related_name='Commented_Post',
@@ -106,15 +112,21 @@ class Post_Comment(models.Model):
         'Is Hidden',
         default=False,
         help_text=
-            'Designates whether this comment should be treated as visible. '
-            'Unselect this instead of deleting comment.'
+        'Designates whether this comment should be treated as visible. '
+        'Unselect this instead of deleting comment.'
     )
 
+    class Meta:
+        db_table = "post_comment"
+        verbose_name = _("comment")
+        verbose_name_plural = _("comments")
+        unique_together = ('user', 'post')
+
     def __str__(self):
-        return str(self.user) + " " + str(self.post)
+        return "%s %s" % (self.user, self.post)
+
 
 class Media(models.Model):
-
     file = models.URLField(
         "File Path",
     )
@@ -127,8 +139,8 @@ class Media(models.Model):
     def __str__(self):
         return str(self.pk)
 
-class User_Post_Media(models.Model):
 
+class UserPostMedia(models.Model):
     user = models.ForeignKey(
         'AuthenticationApp.UserProfile',
         related_name='User',
@@ -153,5 +165,12 @@ class User_Post_Media(models.Model):
         null=True
     )
 
+    class Meta:
+        db_table = "post_user_media"
+        verbose_name = _("post_User_Media")
+        verbose_name_plural = _("post_user_media")
+        unique_together = ('user', 'post', 'media')
+
     def __str__(self):
-        return str(self.user)+"-"+str(self.post_id)+"-"+str(self.media)
+        link = "%s %s %s" % (self.user, self.post_id, self.media)
+        return link
