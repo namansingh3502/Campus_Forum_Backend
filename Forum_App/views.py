@@ -153,26 +153,15 @@ def new_post(request):
 
         # Storing Files in storage and path in db
 
-        index = 0
+        count = 0
+
         for file in request.FILES:
             file = request.FILES[file]
             file_extension = file.name.split('.')[-1]
-            file.name = "media_" + str(index) + '.' + file_extension
+            file.name = "media_%s.%s" % (count, file_extension)
 
             try:
-                default_storage.save("postFiles/" + file.name, file)
-
-                firebaseStorage.child(
-                    "postFiles/post_" + str(post.pk) + "/" + file.name
-                ).put(
-                    "media/" + "postFiles/" + file.name
-                )
-
-                fileURL = firebaseStorage.child(
-                    "postFiles/post_" + str(post.pk) + "/" + file.name
-                ).get_url(
-                    token="9bb2e73f-6b9a-42a1-bef9-78e1794c2a3f"
-                )
+                default_storage.save("postFiles/post_%s/%s" % (str(post.pk), file.name), file)
 
                 media = Media.objects.create(
                     file=fileURL,
@@ -180,8 +169,7 @@ def new_post(request):
                 )
                 media.save()
 
-                default_storage.delete("postFiles/" + file.name)
-                index += 1
+                count += 1
 
                 # media_saved signal creates user_post_media instance
 
@@ -190,14 +178,13 @@ def new_post(request):
             except Exception as e:
                 post.delete()
                 print("exception ", e)
+                return Response({"msg":"Some error occred."}, status=500)
 
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
     else:
         return Response(status=400)
-
-    return Response({'msg': 'unknown error while creating post.'})
 
 
 @api_view(['POST'])
@@ -230,7 +217,7 @@ def edit_post(request):
 
     if postForm.is_valid():
         post = Post.objects.get(pk=data['post_id'])
-        post.body = data['body']
+        post.body = "Edited : \n\n" + data['body']
         post.save()
 
         old_post_channel_list = set(map(lambda x: x[0], post.posted_in.all().values_list('id')))
@@ -243,6 +230,37 @@ def edit_post(request):
 
         for channel_id in removed_channels:
             post.posted_in.remove(Channel.objects.get(id=channel_id))
+
+        post_media = UserPostMedia.objects.filter(post_id=1, media_id__isnull=False)
+        for media in post_media:
+            media.delete()
+        default_storage.save("postFiles/post_%s" % (str(post.pk)))
+
+        count = 0
+        for file in request.FILES:
+            file = request.FILES[file]
+            file_extension = file.name.split('.')[-1]
+            file.name = "media_%s.%s" % (count, file_extension)
+
+            try:
+                default_storage.save("postFiles/post_%s/%s" % (str(post.pk), file.name), file)
+
+                media = Media.objects.create(
+                    file=fileURL,
+                    file_type=str(file.content_type)
+                )
+                media.save()
+
+                count += 1
+
+                # media_saved signal creates user_post_media instance
+
+                media_saved.send(sender="create post", user=request.user.pk, post=post.pk, media=media.pk)
+
+            except Exception as e:
+                post.delete()
+                print("exception ", e)
+                return Response({"msg":"Some error occred."}, status=500)
 
         serializer = PostSerializer(post)
         return Response(serializer.data)

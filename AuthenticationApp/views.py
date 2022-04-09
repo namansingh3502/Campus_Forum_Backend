@@ -33,28 +33,11 @@ def update_user_image(request):
         file_extension = file.name.split('.')[-1]
         file.name = str(user.pk) + '.' + file_extension
 
-        try:
-            default_storage.save("userImage/" + file.name, file)
+        default_storage.delete("profile_pic/" + file.nam)
+        default_storage.save("profile_pic/" + file.name, file)
 
-            firebaseStorage.child(
-                "userImage/" + file.name
-            ).put(
-                "media/" + "userImage/" + file.name
-            )
-
-            fileURL = firebaseStorage.child(
-                "userImage/" + file.name
-            ).get_url(
-                token="9bb2e73f-6b9a-42a1-bef9-78e1794c2a3f"
-            )
-
-            user.user_image = fileURL
-            user.save()
-
-            default_storage.delete("userImage/" + file.name)
-
-        except Exception as e:
-            return Response({"msg": "some error occured."}, status=500)
+        user.user_image = "profile_pic/" + file.name
+        user.save()
 
     serializer = UserProfileSerializer(user)
 

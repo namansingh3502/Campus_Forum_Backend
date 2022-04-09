@@ -1,9 +1,6 @@
-import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
-
-# Create your models here.
 
 
 class UserProfile(AbstractUser):
@@ -17,12 +14,12 @@ class UserProfile(AbstractUser):
     """
 
     DEPARTMENT = (
-        ('CSE', 'CSE'),
-        ('ISE', 'ISE'),
-        ('ECE', 'ECE'),
-        ('EEE', 'EEE'),
-        ('CIVIL', 'CIVIL'),
-        ('MECH', 'MECH')
+        ('CSE', 'Computer Science and Engineering'),
+        ('ISE', 'Information Science and Engineering'),
+        ('ECE', 'Electronics and Communications Engineering'),
+        ('EEE', 'Electrical and Electronics Engineering'),
+        ('CIVIL', 'Civil'),
+        ('MECH', 'Mechanical')
     )
 
     GENDER = (
@@ -51,13 +48,11 @@ class UserProfile(AbstractUser):
     )
     user_image = models.URLField(
         _("Profile Picture"),
-        default="https://firebasestorage.googleapis.com/v0/b/forum-image-storage.appspot.com/o/default.jpeg?alt=media"
-                "&token=1c3af8d5-0028-417a-bc64-8f817c39a0c0"
+        default="default/user_image.jpeg"
     )
     cover_photo = models.URLField(
         _("Cover Photo"),
-        default="https://firebasestorage.googleapis.com/v0/b/forum-image-storage.appspot.com/o/bg.jpeg?alt=media"
-                "&token=6e277919-54af-4c40-b0eb-32b3226facde"
+        default="default/bg.jpeg"
     )
 
     AbstractUser._meta.get_field('first_name').blank = False
