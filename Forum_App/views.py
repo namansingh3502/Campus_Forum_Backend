@@ -1,11 +1,11 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from django.core.paginator import Paginator
 from django.core.files.storage import default_storage
 import json
 
-from .signals import media_saved
+from .signals import media_saved, post_saved
 from .serializers import *
 from .forms import *
 
@@ -23,9 +23,9 @@ def channels(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def channel_details(request, channel_id):
+def channel_details(request, channel_name):
     try:
-        data = Channel.objects.get(id=channel_id)
+        data = Channel.objects.get(name=channel_name)
     except Channel.DoesNotExist:
         return Response({'msg': 'Channel does not exist'}, status=404)
 
@@ -36,37 +36,61 @@ def channel_details(request, channel_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def posts_user(request):
+def posts(request, last_post):
     channel = list(UserProfile.objects.get(pk=request.user.pk).channel_set.all().values_list('id'))
-    post_id = Post.objects.filter(posted_in__in=channel, is_hidden=False).order_by('-pk').distinct()
+    post_id = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
+
+    page = Paginator(post_id, 10).page(1)
+    serializer = PostSerializer(page.object_list, many=True)
+
+    index = len(page.object_list)-1
+    if index < 0:
+        data = {
+            "next": None,
+            "has_more": False,
+            "posts": serializer.data
+        }
+        return Response(data)
+
+    data = {
+        "next": page.object_list[index].id,
+        "has_more": True,
+        "posts": serializer.data
+    }
+    return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_post(request, username, last_post):
+    channel = list(Channel.objects.filter(members__username=username).filter(members__pk=request.user.pk).values_list('id'))
+    post_id = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
     serializer = PostSerializer(post_id, many=True)
 
-    return Response(serializer.data)
+    page = Paginator(post_id, 10).page(1)
+    serializer = PostSerializer(page.object_list, many=True)
+
+    index = len(page.object_list)-1
+    if index < 0:
+        data = {
+            "next": None,
+            "has_more": False,
+            "posts": serializer.data
+        }
+        return Response(data)
+
+    data = {
+        "next": page.object_list[index].id,
+        "has_more": True,
+        "posts": serializer.data
+    }
+    return Response(data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def post_comment(request, post_id):
-    comments = PostComments.objects.filter(post=post_id).order_by('pk')
-    serializer = CommentSerializer(comments, many=True)
-
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def post_likes(request, post_id):
-    likes = PostLikes.objects.filter(post=post_id)
-    serializer = LikeSerializer(likes, many=True)
-
-    return Response(serializer.data)
-
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def channel_post(request, channel_id):
-    channel = Channel.objects.get(id=channel_id)
+def channel_post(request, channel_name, last_post):
+    channel = Channel.objects.get(name=channel_name)
     member_of = UserProfile.objects.get(id=request.user.pk).channel_set.all()
 
     if channel not in member_of:
@@ -75,10 +99,52 @@ def channel_post(request, channel_id):
     if not channel.is_active:
         return Response({'msg': 'Channel not active'}, status=403)
 
-    post_id = Post.objects.filter(posted_in=channel_id, is_hidden=False).order_by('-pk').distinct()
-    serializer = PostSerializer(post_id, many=True)
+    post_id = Post.objects.filter(posted_in=channel.pk, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
 
-    return Response(serializer.data)
+    page = Paginator(post_id, 10).page(1)
+    serializer = PostSerializer(page.object_list, many=True)
+
+    index = len(page.object_list)-1
+    if index < 0:
+        data = {
+            "next": None,
+            "has_more": False,
+            "posts": serializer.data
+        }
+        return Response(data)
+
+    data = {
+        "next": page.object_list[index].id,
+        "has_more": True,
+        "posts": serializer.data
+    }
+    return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def post_comment(request, post_id, last_comment):
+    comments = PostComments.objects.filter(post=post_id, id__lt=last_comment).order_by('-pk')
+
+    page = Paginator(comments, 4).page(1)
+    serializer = CommentSerializer(page.object_list, many=True)
+
+    index = len(page.object_list)-1
+    if index < 0:
+        data = {
+            "next": None,
+            "has_more": False,
+            "posts": serializer.data
+        }
+        return Response(data)
+
+    data = {
+        "next": page.object_list[index].id,
+        "has_more": True,
+        "posts": serializer.data
+    }
+    return Response(data)
+
 
 
 @api_view(['POST'])
@@ -132,15 +198,12 @@ def new_post(request):
 
         # Creating post
 
-        post = Post.objects.create(
-            body=data['body'],
-            media_count=data['media_count']
-        )
+        post = Post.objects.create(body=data['body'])
         post.save()
 
         # post_saved signal creates user_post_media instance
 
-        # post_saved.send(sender="create post", user=request.user.pk, post=post.pk, media=None)
+        post_saved.send(sender="create post", user=request.user.pk, post=post.pk, media=None)
 
         # Adding Channels to the post
 
@@ -164,7 +227,7 @@ def new_post(request):
                 default_storage.save("postFiles/post_%s/%s" % (str(post.pk), file.name), file)
 
                 media = Media.objects.create(
-                    file=fileURL,
+                    file="postFiles/post_%s/%s" % (str(post.pk), file.name),
                     file_type=str(file.content_type)
                 )
                 media.save()
