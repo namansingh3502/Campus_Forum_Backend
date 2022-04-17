@@ -120,7 +120,6 @@ class PostComments(models.Model):
         db_table = "post_comment"
         verbose_name = _("comment")
         verbose_name_plural = _("comments")
-        unique_together = ('user', 'post')
 
     def __str__(self):
         return "%s %s" % (self.user, self.post)

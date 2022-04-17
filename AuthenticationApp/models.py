@@ -17,12 +17,12 @@ class UserProfile(AbstractUser):
     """
 
     DEPARTMENT = (
-        ('CSE', 'CSE'),
-        ('ISE', 'ISE'),
-        ('ECE', 'ECE'),
-        ('EEE', 'EEE'),
-        ('CIVIL', 'CIVIL'),
-        ('MECH', 'MECH')
+        ('CSE', 'Computer Science and Engineering'),
+        ('ISE', 'Information Science and Engineering'),
+        ('ECE', 'Electronics and Communications Engineering'),
+        ('EEE', 'Electrical and Electronics Engineering'),
+        ('CIVIL', 'Civil'),
+        ('MECH', 'Mechanical')
     )
 
     GENDER = (

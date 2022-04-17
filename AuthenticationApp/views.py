@@ -15,12 +15,23 @@ from firebaseConfig import storage as firebaseStorage
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def user_profile(request):
+def profile(request):
 
     user = UserProfile.objects.get(pk=request.user.pk)
     serializer = UserProfileSerializer(user)
 
     return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_profile(request, username):
+
+    try:
+        user = UserProfile.objects.get(username=username)
+        serializers = UserProfileSerializer(user)
+        return Response(serializers.data)
+    except UserProfile.DoesNotExist:
+        return Response({'message':'User does not exist.'}, status=404)
 
 
 @api_view(['POST'])

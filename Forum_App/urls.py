@@ -18,13 +18,20 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('posts', views.posts_user, name="posts_user"),
-    path('channel_list', views.channels, name="Channel-List"),
+    # post api calls
     path('new_post', views.new_post, name="New-Post"),
     path('edit_post', views.edit_post, name="Edit-Post"),
     path('new_comment', views.new_comment, name="New-Comment"),
-    path('<int:post_id>/comments', views.post_comment, name="Post-Comments"),
     path('<int:post_id>/like_post', views.update_post_like, name="Update-Post-Like"),
-    path('channel/<int:channel_id>/posts', views.channel_post, name="Channel-Post"),
-    path('channel/<int:channel_id>/profile', views.channel_details, name="Channel-Details"),
+
+    # get calls
+    path('channel_list', views.channels, name="Channel-List"),
+    path('channel/<str:channel_name>/profile', views.channel_details, name="Channel-Details"),
+
+
+    # paginated query
+    path('posts/<int:last_post>', views.posts, name="posts_user"),
+    path('user/<str:username>/post/<int:last_post>', views.user_post, name="User-Post"),
+    path('channel/<str:channel_name>/post/<int:last_post>', views.channel_post, name="Channel-Post"),
+    path('comment/<int:post_id>/comments/<int:last_comment>', views.post_comment, name="Post-Comments"),
 ]
