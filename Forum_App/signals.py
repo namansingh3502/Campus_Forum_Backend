@@ -18,7 +18,7 @@ def post_save_handler(sender, **kwargs):
 
 @receiver(media_saved)
 def media_save_handler(sender, **kwargs):
-    User_Post_Media.objects.create(
+    UserPostMedia.objects.create(
                     user_id=kwargs['user'],
                     post_id=kwargs['post'],
                     media_id=kwargs['media']

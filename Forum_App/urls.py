@@ -33,5 +33,5 @@ urlpatterns = [
     path('posts/<int:last_post>', views.posts, name="posts_user"),
     path('user/<str:username>/post/<int:last_post>', views.user_post, name="User-Post"),
     path('channel/<str:channel_name>/post/<int:last_post>', views.channel_post, name="Channel-Post"),
-    path('comment/<int:post_id>/comments/<int:last_comment>', views.post_comment, name="Post-Comments"),
+    path('comment/<int:post_id>/<int:last_comment>', views.post_comment, name="Post-Comments"),
 ]
