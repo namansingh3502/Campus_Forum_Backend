@@ -23,12 +23,13 @@ print("running")
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-97g3h-p5h^a1y+y*@^6kmhw5sz-a^r9ms5r2ol7#cks5trthp&'
+
+SECRET_KEY = os.environ['SECRET_KEY_DJANGO']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','campus-forum-naman.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.41.147']
 
 
 # Application definition
@@ -53,7 +54,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -91,15 +91,19 @@ WSGI_APPLICATION = 'Campus_Forum.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'forum_db',
+        'USER': 'naman',
+        'PASSWORD': 'Sarnath@2020',
+        'HOST': 'localhost',
+        'PORT': '5432'
     }
 }
 
 
 # Django-Rest framework config
 
-REST_FRAMEWORK ={
+REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -155,13 +159,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
     "http://localhost:1234",
     "http://127.0.0.1:1234",
-    "http://127.0.0.1:3000",
     "http://127.0.0.1",
-    "https://campus-forum-naman.herokuapp.com",
-    "https://college-forum.vercel.app",
+    "http://192.168.41.147:8000",
+    "http://192.168.41.147",
+    "http://localhost:8000"
 ]
 
 # Path to db routers
@@ -169,7 +172,7 @@ CORS_ORIGIN_WHITELIST = [
 
 # Path tlo media root
 MEDIA_URL = '/media/'
-MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'AuthenticationApp.UserProfile'
 
