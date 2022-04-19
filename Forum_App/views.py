@@ -38,13 +38,18 @@ def channel_details(request, channel_name):
 @permission_classes([IsAuthenticated])
 def posts(request, last_post):
     channel = list(UserProfile.objects.get(pk=request.user.pk).channel_set.all().values_list('id'))
-    post_id = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
+    posts = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()[:10]
+    serializer = PostSerializer(posts, many=True)
 
-    page = Paginator(post_id, 10).page(1)
-    serializer = PostSerializer(page.object_list, many=True)
+    index = posts.count()
 
-    index = len(page.object_list)-1
     if index < 0:
+        data = {
+            "msg": "No posts found.",
+        }
+        return Response(data, status=404)
+
+    elif index < 10:
         data = {
             "next": None,
             "has_more": False,
@@ -53,7 +58,7 @@ def posts(request, last_post):
         return Response(data)
 
     data = {
-        "next": page.object_list[index].id,
+        "next": posts[index-1].id,
         "has_more": True,
         "posts": serializer.data
     }
@@ -64,14 +69,18 @@ def posts(request, last_post):
 @permission_classes([IsAuthenticated])
 def user_post(request, username, last_post):
     channel = list(Channel.objects.filter(members__username=username).filter(members__pk=request.user.pk).values_list('id'))
-    post_id = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
-    serializer = PostSerializer(post_id, many=True)
+    posts = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
+    serializer = PostSerializer(posts, many=True)
 
-    page = Paginator(post_id, 10).page(1)
-    serializer = PostSerializer(page.object_list, many=True)
+    index = posts.count()
 
-    index = len(page.object_list)-1
     if index < 0:
+        data = {
+            "msg": "No posts found.",
+        }
+        return Response(data, status=404)
+
+    elif index < 10:
         data = {
             "next": None,
             "has_more": False,
@@ -80,7 +89,7 @@ def user_post(request, username, last_post):
         return Response(data)
 
     data = {
-        "next": page.object_list[index].id,
+        "next": posts[index - 1].id,
         "has_more": True,
         "posts": serializer.data
     }
@@ -99,13 +108,18 @@ def channel_post(request, channel_name, last_post):
     if not channel.is_active:
         return Response({'msg': 'Channel not active'}, status=403)
 
-    post_id = Post.objects.filter(posted_in=channel.pk, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
+    posts = Post.objects.filter(posted_in=channel.pk, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()[:10]
+    serializer = PostSerializer(posts, many=True)
 
-    page = Paginator(post_id, 10).page(1)
-    serializer = PostSerializer(page.object_list, many=True)
+    index = posts.count()
 
-    index = len(page.object_list)-1
     if index < 0:
+        data = {
+            "msg": "No posts found.",
+        }
+        return Response(data, status=404)
+
+    elif index < 10:
         data = {
             "next": None,
             "has_more": False,
@@ -114,7 +128,7 @@ def channel_post(request, channel_name, last_post):
         return Response(data)
 
     data = {
-        "next": page.object_list[index].id,
+        "next": posts[index - 1].id,
         "has_more": True,
         "posts": serializer.data
     }
@@ -124,24 +138,30 @@ def channel_post(request, channel_name, last_post):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def post_comment(request, post_id, last_comment):
-    comments = PostComments.objects.filter(post=post_id, id__lt=last_comment).order_by('-pk')
+    comments = PostComments.objects.filter(post=post_id, id__lt=last_comment).order_by('-pk')[:4]
 
-    page = Paginator(comments, 4).page(1)
-    serializer = CommentSerializer(page.object_list, many=True)
+    serializer = CommentSerializer(comments, many=True)
 
-    index = len(page.object_list)-1
+    index = comments.count()
+
     if index < 0:
+        data = {
+            "msg": "No posts found.",
+        }
+        return Response(data, status=404)
+
+    elif index < 4:
         data = {
             "next": None,
             "has_more": False,
-            "posts": serializer.data
+            "comment": serializer.data
         }
         return Response(data)
 
     data = {
-        "next": page.object_list[index].id,
+        "next": comments[index - 1].id,
         "has_more": True,
-        "posts": serializer.data
+        "comment": serializer.data
     }
     return Response(data)
 
