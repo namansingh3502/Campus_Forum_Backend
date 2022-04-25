@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-# import django_heroku
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +25,7 @@ print("running")
 #SECRET_KEY = os.environ['SECRET_KEY_DJANGO']
 SECRET_KEY = 'django-insecure-97g3h-p5h^a1y+y*@^6kmhw5sz-a^r9ms5r2ol7#cks5trthp&'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.41.147', 'http://192.168.41.147']
 
@@ -166,13 +164,12 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:8000"
 ]
 
-# Path to db routers
-#DATABASE_ROUTERS = [ BASE_DIR / 'routers/db_routers.py' ]
+#https://stackoverflow.com/questions/70285834/forbidden-403-csrf-verification-failed-request-aborted-reason-given-for-fail
+
+CSRF_TRUSTED_ORIGINS = ['http://192.168.41.147']
 
 # Path tlo media root
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-#
-AUTH_USER_MODEL = 'AuthenticationApp.UserProfile'
 
-# django_heroku.settings(locals())
+AUTH_USER_MODEL = 'AuthenticationApp.UserProfile'
