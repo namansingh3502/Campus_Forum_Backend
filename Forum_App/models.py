@@ -47,7 +47,7 @@ class Post(models.Model):
         Information related to post.
     """
 
-    body = models.TextField("Post text", blank=False, null=False)
+    body = models.TextField("Post text", blank=True, null=False)
     time = models.DateTimeField(blank=False, auto_now=True)
 
     is_hidden = models.BooleanField(
@@ -61,6 +61,11 @@ class Post(models.Model):
     posted_in = models.ManyToManyField(
         to="Channel",
         related_name="Post_Channel"
+    )
+    edited = models.BooleanField(
+        default=False,
+        blank=False,
+        null=False
     )
 
     class Meta:

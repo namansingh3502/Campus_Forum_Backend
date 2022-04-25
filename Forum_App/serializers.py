@@ -80,7 +80,7 @@ class PostDataSerializer(serializers.ModelSerializer):
         return "%s" % post.Commented_Post.count()
 
     def getLikes(self, post):
-        likes = PostLikes.objects.filter(pk=post.pk).all()
+        likes = PostLikes.objects.filter(post=post.pk).all()
         serializer = LikeSerializer(likes, many=True)
         return serializer.data
 

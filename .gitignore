@@ -29,3 +29,4 @@ staticfiles
 /media/userimage/
 /media/postimages/
 /media/postFiles/
+/static/

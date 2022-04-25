@@ -166,7 +166,6 @@ def post_comment(request, post_id, last_comment):
     return Response(data)
 
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_post_like(request, post_id):
@@ -244,7 +243,7 @@ def new_post(request):
             file.name = "media_%s.%s" % (count, file_extension)
 
             try:
-                default_storage.save("postFiles/post_%s/%s" % (str(post.pk), file.name), file)
+                default_storage.save("media/postFiles/post_%s/%s" % (str(post.pk), file.name), file)
 
                 media = Media.objects.create(
                     file="postFiles/post_%s/%s" % (str(post.pk), file.name),
