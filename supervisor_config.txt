@@ -1,0 +1,8 @@
+[program:Campus_Forum]
+directory=/home/naman/Desktop/project/Campus_Forum_Backend
+command=/home/naman/Desktop/project/Campus_Forum_Backend/venv/bin/gunicorn Campus_Forum.wsgi:application -c /home/naman/Desktop/project/Campus_Forum_Backend/gunicorn.conf.py
+user=naman
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/home/naman/Desktop/project/logs/supervisor_error.log
