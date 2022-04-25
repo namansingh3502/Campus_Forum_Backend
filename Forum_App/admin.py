@@ -29,19 +29,19 @@ class ChannelAdmin(admin.ModelAdmin):
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
 
-    list_display = ('pk', 'time', 'is_hidden')
+    list_display = ('pk', 'time', 'is_hidden', 'is_edited')
 
     search_fields = ('pk',)
 
-    list_filter = ('is_hidden', )
+    list_filter = ('is_hidden', 'is_edited')
 
     fieldsets = (
         ('Post Details', {
-            'fields': ('is_hidden', 'posted_in', 'time', 'body')
+            'fields': ('is_hidden', 'is_edited', 'posted_in', 'time', 'body')
         }),
     )
 
-    readonly_fields = ('posted_in', 'time', 'body')
+    readonly_fields = ('posted_in', 'time', 'body', 'is_edited' )
 
     def has_add_permission(self, request, obj=None):
         return False

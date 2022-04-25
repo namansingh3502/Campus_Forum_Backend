@@ -62,7 +62,7 @@ class Post(models.Model):
         to="Channel",
         related_name="Post_Channel"
     )
-    edited = models.BooleanField(
+    is_edited = models.BooleanField(
         default=False,
         blank=False,
         null=False

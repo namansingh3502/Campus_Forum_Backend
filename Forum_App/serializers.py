@@ -71,6 +71,7 @@ class PostDataSerializer(serializers.ModelSerializer):
             'id',
             'body',
             'time',
+            'is_edited',
             'posted_in',
             'likes',
             'comments_count'

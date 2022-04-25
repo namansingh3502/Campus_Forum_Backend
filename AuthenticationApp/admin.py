@@ -28,8 +28,8 @@ class UserProfileAdmin(UserAdmin):
                 'is_active',
                 'is_staff',
                 'is_superuser',
-                'groups',
-                'user_permissions'
+                # 'groups',
+                # 'user_permissions'
             )
         }),
         ('Important dates', {
@@ -56,8 +56,8 @@ class UserProfileAdmin(UserAdmin):
                 'gender',
                 'email',
                 'phone',
-                'user_image',
-                'cover_photo'
+                # 'user_image',
+                # 'cover_photo'
             )
         }),
         ('Permissions', {
@@ -65,11 +65,11 @@ class UserProfileAdmin(UserAdmin):
                 'is_active',
                 'is_staff',
                 'is_superuser',
-                'groups',
-                'user_permissions'
+                # 'groups',
+                # 'user_permissions'
             )
         }),
     )
 
-    filter_horizontal = ('groups', 'user_permissions')
+    # filter_horizontal = ('groups', 'user_permissions')
 
