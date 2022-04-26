@@ -44,10 +44,10 @@ def update_user_image(request):
         file_extension = file.name.split('.')[-1]
         file.name = str(user.pk) + '.' + file_extension
 
-        default_storage.delete("profile_pic/" + file.name)
-        default_storage.save("profile_pic/" + file.name, file)
+        default_storage.delete("media/profile_pic/" + file.name)
+        default_storage.save("media/profile_pic/" + file.name, file)
 
-        user.user_image = "profile_pic/" + file.name
+        user.user_image = "media/profile_pic/" + file.name
         user.save()
 
     serializer = UserProfileSerializer(user)
