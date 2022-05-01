@@ -23,6 +23,7 @@ urlpatterns = [
     path('edit_post', views.edit_post, name="Edit-Post"),
     path('new_comment', views.new_comment, name="New-Comment"),
     path('<int:post_id>/like_post', views.update_post_like, name="Update-Post-Like"),
+    path('<int:post_id>/hide_post', views.hide_post, name="Hide-Post"),
 
     # get calls
     path('channel_list', views.channels, name="Channel-List"),

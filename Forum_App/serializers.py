@@ -78,7 +78,7 @@ class PostDataSerializer(serializers.ModelSerializer):
         ]
 
     def getCommentCount(self, post):
-        return "%s" % post.Commented_Post.count()
+        return "%s" % post.Commented_Post.filter(is_hidden=False).count()
 
     def getLikes(self, post):
         likes = PostLikes.objects.filter(post=post.pk).all()

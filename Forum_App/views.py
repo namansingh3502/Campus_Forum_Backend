@@ -4,13 +4,11 @@ from rest_framework.response import Response
 from django.core.paginator import Paginator
 from django.core.files.storage import default_storage
 import json
+import shutil
 
 from .signals import media_saved, post_saved
 from .serializers import *
 from .forms import *
-
-from firebaseConfig import storage as firebaseStorage
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -38,8 +36,10 @@ def channel_details(request, channel_name):
 @permission_classes([IsAuthenticated])
 def posts(request, last_post):
     channel = list(UserProfile.objects.get(pk=request.user.pk).channel_set.all().values_list('id'))
-    posts = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()[:10]
-    serializer = PostSerializer(posts, many=True)
+    posts = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
+
+    filtered_post = posts[:10]
+    serializer = PostSerializer(filtered_post, many=True)
 
     index = posts.count()
 
@@ -49,7 +49,7 @@ def posts(request, last_post):
         }
         return Response(data, status=404)
 
-    elif index < 10:
+    elif index < 10  or posts.count() == 10:
         data = {
             "next": None,
             "has_more": False,
@@ -70,7 +70,9 @@ def posts(request, last_post):
 def user_post(request, username, last_post):
     channel = list(Channel.objects.filter(members__username=username).filter(members__pk=request.user.pk).values_list('id'))
     posts = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
-    serializer = PostSerializer(posts, many=True)
+
+    filtered_post = posts[:10]
+    serializer = PostSerializer(filtered_post, many=True)
 
     index = posts.count()
 
@@ -80,7 +82,7 @@ def user_post(request, username, last_post):
         }
         return Response(data, status=404)
 
-    elif index < 10:
+    elif index < 10 or posts.count() == 10:
         data = {
             "next": None,
             "has_more": False,
@@ -108,8 +110,9 @@ def channel_post(request, channel_name, last_post):
     if not channel.is_active:
         return Response({'msg': 'Channel not active'}, status=403)
 
-    posts = Post.objects.filter(posted_in=channel.pk, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()[:10]
-    serializer = PostSerializer(posts, many=True)
+    posts = Post.objects.filter(posted_in=channel.pk, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
+    filtered_post = posts[:10]
+    serializer = PostSerializer(filtered_post, many=True)
 
     index = posts.count()
 
@@ -119,7 +122,7 @@ def channel_post(request, channel_name, last_post):
         }
         return Response(data, status=404)
 
-    elif index < 10:
+    elif index < 10 or posts.count() == 10:
         data = {
             "next": None,
             "has_more": False,
@@ -138,11 +141,11 @@ def channel_post(request, channel_name, last_post):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def post_comment(request, post_id, last_comment):
-    comments = PostComments.objects.filter(post=post_id, id__lt=last_comment).order_by('-pk')[:4]
+    comments = PostComments.objects.filter(post=post_id, id__lt=last_comment, is_hidden=False).order_by('-pk')
+    filtered_comment = comments[:4]
+    serializer = CommentSerializer(filtered_comment, many=True)
 
-    serializer = CommentSerializer(comments, many=True)
-
-    index = comments.count()
+    index = filtered_comment.count()
 
     if index < 0:
         data = {
@@ -150,7 +153,7 @@ def post_comment(request, post_id, last_comment):
         }
         return Response(data, status=404)
 
-    elif index < 4:
+    elif index < 4 or comments.count() == 4:
         data = {
             "next": None,
             "has_more": False,
@@ -272,7 +275,13 @@ def new_post(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def edit_post(request):
-    data = json.loads(request.body)
+    data = json.loads(request.POST['data'])
+
+    "check if correct user is editing post"
+    post_user_id = UserPostMedia.objects.filter(post_id=data['post_id'])[0].user.id
+
+    if post_user_id != request.user.id :
+        return Response({'msg : Unauthorised '}, status=401)
 
     "check if channel list is empty"
 
@@ -298,8 +307,9 @@ def edit_post(request):
     postForm = PostForm(data)
 
     if postForm.is_valid():
-        post = Post.objects.get(pk=data['post_id'])
-        post.body = "Edited : \n\n" + data['body']
+        post = Post.objects.get(id=data['post_id'])
+        post.body = data['body']
+        post.is_edited = True
         post.save()
 
         old_post_channel_list = set(map(lambda x: x[0], post.posted_in.all().values_list('id')))
@@ -313,12 +323,19 @@ def edit_post(request):
         for channel_id in removed_channels:
             post.posted_in.remove(Channel.objects.get(id=channel_id))
 
-        post_media = UserPostMedia.objects.filter(post_id=1, media_id__isnull=False)
+        post_media = UserPostMedia.objects.filter(post_id=post.id, media_id__isnull=False)
         for media in post_media:
             media.delete()
         default_storage.save("postFiles/post_%s" % (str(post.pk)))
 
         count = 0
+
+        try :
+            shutil.rmtree('/home/naman/Desktop/forum/Campus_Forum_Backend/media/postFiles/post_%s' % post.id)
+
+        except FileNotFoundError:
+            print("No directory")
+
         for file in request.FILES:
             file = request.FILES[file]
             file_extension = file.name.split('.')[-1]
@@ -328,7 +345,7 @@ def edit_post(request):
                 default_storage.save("postFiles/post_%s/%s" % (str(post.pk), file.name), file)
 
                 media = Media.objects.create(
-                    file=fileURL,
+                    file="postFiles/post_%s/%s" % (str(post.pk), file.name),
                     file_type=str(file.content_type)
                 )
                 media.save()
@@ -349,6 +366,20 @@ def edit_post(request):
 
     else:
         return Response(status=400)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def hide_post(request, post_id):
+    "check if correct user is editing post"
+    post = UserPostMedia.objects.filter(post_id=post_id)[0]
+
+    if post.user.id != request.user.id :
+        return Response({'msg : Unauthorised '}, status=401)
+
+    post.post.is_hidden = True
+    post.post.save()
+
+    return Response({'msg':'msg'})
 
 
 @api_view(['POST'])
