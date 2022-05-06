@@ -41,7 +41,7 @@ def posts(request, last_post):
     filtered_post = posts[:10]
     serializer = PostSerializer(filtered_post, many=True)
 
-    index = posts.count()
+    index = filtered_post.count()
 
     if index < 0:
         data = {
@@ -74,7 +74,7 @@ def user_post(request, username, last_post):
     filtered_post = posts[:10]
     serializer = PostSerializer(filtered_post, many=True)
 
-    index = posts.count()
+    index = filtered_post.count()
 
     if index < 0:
         data = {
@@ -114,7 +114,7 @@ def channel_post(request, channel_name, last_post):
     filtered_post = posts[:10]
     serializer = PostSerializer(filtered_post, many=True)
 
-    index = posts.count()
+    index = filtered_post.count()
 
     if index < 0:
         data = {
@@ -295,7 +295,7 @@ def edit_post(request):
 
     post_channel_list = set(map(lambda x: x['id'], data['channel_list']))
 
-    """ 
+    """
         all( channel in channel_member_list for channel in post_channel_list )
         above function does somthing similar
         https://stackoverflow.com/questions/16579085/how-can-i-verify-if-one-list-is-a-subset-of-another
@@ -303,6 +303,7 @@ def edit_post(request):
 
     if not post_channel_list.issubset(channel_member_list):
         return Response(status=400)
+
 
     postForm = PostForm(data)
 
