@@ -246,7 +246,7 @@ def new_post(request):
             file.name = "media_%s.%s" % (count, file_extension)
 
             try:
-                default_storage.save("media/postFiles/post_%s/%s" % (str(post.pk), file.name), file)
+                default_storage.save("postFiles/post_%s/%s" % (str(post.pk), file.name), file)
 
                 media = Media.objects.create(
                     file="postFiles/post_%s/%s" % (str(post.pk), file.name),
@@ -326,7 +326,6 @@ def edit_post(request):
         post_media = UserPostMedia.objects.filter(post_id=post.id, media_id__isnull=False)
         for media in post_media:
             media.delete()
-        default_storage.save("postFiles/post_%s" % (str(post.pk)))
 
         count = 0
 
