@@ -7,11 +7,8 @@ from rest_framework.response import Response
 
 from .serializers import *
 from .models import *
-from firebaseConfig import storage as firebaseStorage
 
-
-# Create your views here.
-
+import uuid
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -42,7 +39,7 @@ def update_user_image(request):
     for file in request.FILES:
         file = request.FILES[file]
         file_extension = file.name.split('.')[-1]
-        file.name = str(user.username) + '.' + file_extension
+        file.name = str(user.username) + '.' + file_extension + "-" + str(uuid.uuid4())
 
         default_storage.delete("profile_pic/%s" % file.name)
         default_storage.save("profile_pic/%s" % file.name, file)
