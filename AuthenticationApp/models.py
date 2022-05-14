@@ -10,7 +10,7 @@ class UserProfile(AbstractUser):
         username, password, first_name, last_name, email, is_active,
         is_staff, is_superuser, last_login, date_joined
     Additional Details
-        prefix, middle_name, phone, address, id
+        prefix, middle_name, phone
     """
 
     DEPARTMENT = (

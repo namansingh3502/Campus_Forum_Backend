@@ -7,8 +7,30 @@ from rest_framework.response import Response
 
 from .serializers import *
 from .models import *
-
+from .forms import RegistrationForm
 import uuid
+
+
+@api_view(['POST'])
+def user_registraion(request):
+    user = request.user
+    if user.is_authenticated:
+        return HttpResponse("You are already authenticated.")
+
+    data = request.data['data']
+
+    data['gender'] = data['gender']['value']
+    data['department'] = data['department']['value']
+
+    form = RegistrationForm(data)
+
+    if form.is_valid():
+        form.save()
+    else:
+        return Response({'msg': form.errors.values()}, status=500)
+
+    return Response({'msg': "message"}, status=500)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -18,6 +40,7 @@ def profile(request):
     serializer = UserProfileSerializer(user)
 
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

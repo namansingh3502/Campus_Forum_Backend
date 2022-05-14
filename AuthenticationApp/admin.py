@@ -54,10 +54,10 @@ class UserProfileAdmin(UserAdmin):
                 'middle_name',
                 'last_name',
                 'gender',
+                'department',
                 'email',
                 'phone',
-                # 'user_image',
-                # 'cover_photo'
+
             )
         }),
         ('Permissions', {
