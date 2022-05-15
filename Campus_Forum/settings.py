@@ -98,6 +98,26 @@ DATABASES = {
     }
 }
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'namans3502@gmail.com'
+EMAIL_HOST_PASSWORD = 'wspuzehewzrxotvb'
+
+DOMAIN = "localhost:8000"  # local: localhost:3000
+SITE_NAME = 'localhost'
+DJOSER = {
+    'LOGIN_FIELD': 'username',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+}
 
 # Django-Rest framework config
 
@@ -170,7 +190,7 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
-        'job_portal': {
+        'Campus_Forum': {
             'handlers': ['console', 'logfile'],
             'level': 'DEBUG',
             'propagate': False,

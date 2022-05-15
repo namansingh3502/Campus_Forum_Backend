@@ -1,5 +1,5 @@
 django~=4.0
-djoser
+djoser~=2.1.0
 django-rest-framework
 django-cors-headers
 psycopg2-binary
@@ -10,3 +10,5 @@ gunicorn
 asgiref
 pytz
 Pyrebase~=3.0.27
+
+six~=1.16.0
