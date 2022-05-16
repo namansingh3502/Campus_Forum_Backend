@@ -21,7 +21,9 @@ from . import views
 urlpatterns = [
     path('', include('djoser.urls')),
     path('', include('djoser.urls.authtoken')),
-    path('register', views.user_registraion, name="User-Registration"),
+    path('register', views.user_registration, name="User-Registration"),
+    path('reset_password', views.reset_password, name="Password-Reset"),
+    path('reset_password_request', views.email_reset_link, name="Password-Reset-Link"),
     path('activate/<uidb64>/<token>', views.activate_user, name="Activate-Account"),
     path('user/<str:username>', views.user_profile, name="Current-User-Details"),
     path('user/', views.profile, name="Current-User-Details"),

@@ -37,3 +37,9 @@ class RegistrationForm(UserCreationForm):
         except UserProfile.DoesNotExist:
             return username
         raise forms.ValidationError('Username "%s" is already in use.' % username)
+
+
+class PasswordResetForm(UserCreationForm):
+    class Meta:
+        model = UserProfile
+        fields = ('password1','password2')

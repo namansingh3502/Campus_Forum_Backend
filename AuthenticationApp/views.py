@@ -13,14 +13,14 @@ from django.core.mail import EmailMessage
 
 from .serializers import *
 from .models import *
-from .forms import RegistrationForm
+from .forms import RegistrationForm, PasswordResetForm
 import uuid
 
 from .tokens import account_activation_token
 
 
 @api_view(['POST'])
-def user_registraion(request):
+def user_registration(request):
     user = request.user
     if user.is_authenticated:
         return HttpResponse("You are already authenticated.")
@@ -71,10 +71,10 @@ def profile(request):
 def user_profile(request, username):
     try:
         user = UserProfile.objects.get(username=username)
-        serializers = UserProfileSerializer(user)
-        return Response(serializers.data)
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data)
     except UserProfile.DoesNotExist:
-        return Response({'message':'User does not exist.'}, status=404)
+        return Response({'message': 'User does not exist.'}, status=404)
 
 
 @api_view(['POST'])
@@ -108,7 +108,6 @@ def csrf_token_generator(request):
 
 @api_view(['GET'])
 def activate_user(request, uidb64, token):
-
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = UserProfile.objects.get(pk=uid)
@@ -120,3 +119,48 @@ def activate_user(request, uidb64, token):
         return Response({'msg': "Account activated."}, status=200)
     else:
         return Response({'msg': "Activation link is invalid!."}, status=400)
+
+
+@api_view(['POST'])
+def email_reset_link(request):
+    email = request.data['data']['email']
+    try:
+        user = UserProfile.objects.get(email=email)
+        mail_subject = 'Password reset link.'
+        message = render_to_string('reset_password_email.html', {
+            'user': user,
+            'domain': '192.168.41.147',
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': account_activation_token.make_token(user),
+        })
+        email = EmailMessage(
+            mail_subject, message, to=[email]
+        )
+        email.send()
+        return Response({'msg': 'Password link sent successfully.'}, status=200)
+    except UserProfile.DoesNotExist:
+        return Response({'msg': 'No user exists with given email.'}, status=400)
+
+
+@api_view(['POST'])
+def reset_password(request):
+    password = request.data['data']
+    uidb64 = request.data['uidb64']
+    token = request.data['token']
+
+    form = PasswordResetForm(password)
+
+    if form.is_valid():
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = UserProfile.objects.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, UserProfile.DoesNotExist):
+            user = None
+        if user is not None and account_activation_token.check_token(user, token):
+            user.set_password(form.cleaned_data['password1'])
+            user.save()
+            return Response({'msg': "Password updated successfully."}, status=200)
+        else:
+            return Response({'msg': "Password update link is invalid!."}, status=400)
+    else:
+        return Response({'msg': form.error_messages}, status=400)
