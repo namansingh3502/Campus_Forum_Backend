@@ -13,92 +13,95 @@ class ChannelAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Channel Details', {
-            'fields': ('name', 'admin', 'is_active', 'moderator')
+            # 'fields': ('is_active', 'name', 'admin', 'moderator')
+            'fields': ('is_active', 'name', 'admin')
         }),
         ('Channel Member', {
-            'fields': ('member_of',)
+            # 'fields': ('members','moderator')
+            'fields': ('members',)
         }),
     )
 
-    filter_horizontal = ('moderator', 'member_of')
+    # filter_horizontal = ('moderator', 'members')
+    filter_horizontal = ('members',)
 
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
 
-    """
-        def has_add_permission(self, request, obj=None):
-            return False
+    list_display = ('pk', 'time', 'is_hidden', 'is_edited')
 
-        def has_delete_permission(self, request, obj=None):
-            return False
-    """
+    search_fields = ('pk',)
 
-    list_display = ('pk', 'time', 'is_hidden')
-
-    list_filter = ('is_hidden', )
+    list_filter = ('is_hidden', 'is_edited')
 
     fieldsets = (
         ('Post Details', {
-            'fields': ('body', 'posted_in')
+            'fields': ('is_hidden', 'is_edited', 'posted_in', 'time', 'body')
         }),
-        ('Additional Details', {
-            'fields': ('time', 'media_count')
-        }),
-        ('Visibility', {
-            'fields': ('is_hidden',)
-        })
     )
 
-    readonly_fields = ('time', 'media_count', 'posted_in', 'body')
+    readonly_fields = ('posted_in', 'time', 'body', 'is_edited' )
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
-@admin.register(Post_Comment)
+@admin.register(PostComments)
 class PostCommentAdmin(admin.ModelAdmin):
 
-    """
-        def has_add_permission(self, request, obj=None):
-            return False
-
-        def has_delete_permission(self, request, obj=None):
-            return False
-
-    """
-
     list_display = ('post', 'user', 'is_hidden')
+
+    search_fields = ('post__pk', 'user__username')
 
     list_filter = ('is_hidden', )
 
     fieldsets = (
         ('Comment Details', {
-            'fields': ('user', 'post', 'body', 'time')
+            'fields': ('is_hidden', 'post', 'user', 'time', 'body')
         }),
-        ('Visibility', {
-            'fields': ('is_hidden',)
-        })
     )
 
-    readonly_fields = ('user', 'post', 'time', 'body')
+    readonly_fields = ('post', 'user', 'time', 'body')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
-@admin.register(Post_Like)
+@admin.register(PostLikes)
 class PostLikeAdmin(admin.ModelAdmin):
 
     list_display = ('user', 'post')
 
+    search_fields = ('post__pk', 'user__username')
+
     fieldsets = (
         ('Like Details', {
-            'fields': ('user', 'post', 'time')
+            'fields': ('user', 'post')
         }),
     )
 
-    readonly_fields = ('time', 'user', 'post')
+    readonly_fields = ('post', 'user')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
-@admin.register(User_Post_Media)
+@admin.register(UserPostMedia)
 class UserPostMedia(admin.ModelAdmin):
 
-    list_display = ('user', 'post')
+    list_display = ('user', 'post', 'media')
+
+    search_fields = ('post__pk', 'user__username')
 
     fieldsets = (
         ('User Post Details ', {
@@ -107,3 +110,9 @@ class UserPostMedia(admin.ModelAdmin):
     )
 
     readonly_fields = ('user', 'post', 'media')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

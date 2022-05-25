@@ -5,23 +5,26 @@ from AuthenticationApp.models import *
 
 class UserDetailsSerializer(serializers.ModelSerializer):
 
+    full_name = serializers.SerializerMethodField('get_full_name')
+
     class Meta:
         model = UserProfile
         fields = [
             'id',
             'username',
-            'prefix',
-            'first_name',
-            'middle_name',
-            'last_name',
-            'user_image'
+            'full_name',
+            'user_image',
+            'cover_photo'
         ]
+
+    def get_full_name(self, user):
+        return "%s %s %s" % (user.first_name, user.middle_name, user.last_name)
 
 
 class ChannelDetailsSerializer(serializers.ModelSerializer):
 
     admin = UserDetailsSerializer('admin')
-    member_count = serializers.IntegerField(source='userprofile_set.count', read_only=True)
+    member_count = serializers.IntegerField(source='members.count', read_only=True)
 
     class Meta:
         model = Channel
@@ -33,27 +36,34 @@ class ChannelDetailsSerializer(serializers.ModelSerializer):
         ]
 
 
-class PostChannelSerializer(serializers.ModelSerializer):
-
+class ChannelListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Channel
         fields = [
-            'id',
-            'name'
+            'name',
+            'id'
         ]
 
 
 class LikeSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user', read_only=True)
+    full_name = serializers.SerializerMethodField('get_full_name')
 
     class Meta:
-        model = Post_Like
-        fields = ('username', 'user_id')
+        model = PostLikes
+        fields = [
+            'full_name',
+            'user_id',
+        ]
+
+    def get_full_name(self, likes):
+        user = likes.user
+        return "%s %s %s" % (user.first_name, user.middle_name, user.last_name)
 
 
 class PostDataSerializer(serializers.ModelSerializer):
-    posted_in = PostChannelSerializer(many=True)
-    Liked_Post = LikeSerializer(many=True, read_only=True)
+    posted_in = ChannelListSerializer(many=True)
+    likes = serializers.SerializerMethodField("getLikes")
+    comments_count = serializers.SerializerMethodField("getCommentCount")
 
     class Meta:
         model = Post
@@ -61,10 +71,19 @@ class PostDataSerializer(serializers.ModelSerializer):
             'id',
             'body',
             'time',
-            'media_count',
+            'is_edited',
             'posted_in',
-            'Liked_Post'
+            'likes',
+            'comments_count'
         ]
+
+    def getCommentCount(self, post):
+        return "%s" % post.Commented_Post.filter(is_hidden=False).count()
+
+    def getLikes(self, post):
+        likes = PostLikes.objects.filter(post=post.pk).all()
+        serializer = LikeSerializer(likes, many=True)
+        return serializer.data
 
 
 class MediaDataSerializer(serializers.ModelSerializer):
@@ -75,9 +94,9 @@ class MediaDataSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.Serializer):
-    user = serializers.SerializerMethodField("getUser")
-    post = serializers.SerializerMethodField("getPost")
-    media = serializers.SerializerMethodField("getMedia")
+    user = serializers.SerializerMethodField("get_user")
+    post = serializers.SerializerMethodField("get_post")
+    media = serializers.SerializerMethodField("get_media")
 
     class Meta:
         fields = [
@@ -86,17 +105,17 @@ class PostSerializer(serializers.Serializer):
             'media',
         ]
 
-    def getUser(self, post):
+    def get_user(self, post):
         user = post.Post.all()[0].user
         serializers = UserDetailsSerializer(user)
         return serializers.data
 
-    def getPost(self, post):
+    def get_post(self, post):
         serializers = PostDataSerializer(post)
         return serializers.data
 
 
-    def getMedia(self, post):
+    def get_media(self, post):
         media_file = post.Post.filter(media_id__isnull = False).order_by('pk')
 
         media_list=[]
@@ -111,14 +130,5 @@ class CommentSerializer(serializers.ModelSerializer):
     user = UserDetailsSerializer(read_only=True)
 
     class Meta:
-        model = Post_Comment
+        model = PostComments
         fields = ('id', 'user', 'time', 'body')
-
-
-class ChannelListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Channel
-        fields = [
-            'name',
-            'id'
-        ]

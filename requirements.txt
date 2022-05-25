@@ -1,14 +1,14 @@
 django~=4.0
-djoser
+djoser~=2.1.0
 django-rest-framework
 django-cors-headers
+psycopg2-binary
 
 djangorestframework~=3.13.1
 
 gunicorn
 asgiref
 pytz
-sqlparse
-whitenoise
-django_heroku
 Pyrebase~=3.0.27
+
+six~=1.16.0
