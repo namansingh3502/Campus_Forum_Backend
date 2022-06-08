@@ -1,3 +1,5 @@
+import os
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -6,9 +8,11 @@ from django.core.files.storage import default_storage
 import json
 import shutil
 
+from Campus_Forum.custom_storage import MediaStorage
 from .signals import media_saved, post_saved
 from .serializers import *
 from .forms import *
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -49,7 +53,7 @@ def posts(request, last_post):
         }
         return Response(data, status=404)
 
-    elif index < 10  or posts.count() == 10:
+    elif index < 10 or posts.count() == 10:
         data = {
             "next": None,
             "has_more": False,
@@ -58,7 +62,7 @@ def posts(request, last_post):
         return Response(data)
 
     data = {
-        "next": posts[index-1].id,
+        "next": posts[index - 1].id,
         "has_more": True,
         "posts": serializer.data
     }
@@ -68,7 +72,8 @@ def posts(request, last_post):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_post(request, username, last_post):
-    channel = list(Channel.objects.filter(members__username=username).filter(members__pk=request.user.pk).values_list('id'))
+    channel = list(
+        Channel.objects.filter(members__username=username).filter(members__pk=request.user.pk).values_list('id'))
     posts = Post.objects.filter(posted_in__in=channel, is_hidden=False, id__lt=last_post).order_by('-pk').distinct()
 
     filtered_post = posts[:10]
@@ -149,7 +154,7 @@ def post_comment(request, post_id, last_comment):
 
     if index < 0:
         data = {
-            "msg": "No posts found.",
+            "msg": "No posts found."
         }
         return Response(data, status=404)
 
@@ -240,30 +245,41 @@ def new_post(request):
 
         count = 0
 
+        file_directory = 'post_media/post_%d' % post.id
+        media_storage = MediaStorage()
+
         for file in request.FILES:
-            file = request.FILES[file]
-            file_extension = file.name.split('.')[-1]
-            file.name = "media_%s.%s" % (count, file_extension)
+            file_obj = request.FILES[file]
+            file_extension = file_obj.name.split('.')[-1]
+
+            file_name = "media_%d.%s" % (
+                count,
+                file_extension
+            )
+
+            file_path = os.path.join(
+                file_directory,
+                file_name
+            )
 
             try:
-                default_storage.save("postFiles/post_%s/%s" % (str(post.pk), file.name), file)
-
+                media_storage.save(file_path, file_obj)
                 media = Media.objects.create(
-                    file="postFiles/post_%s/%s" % (str(post.pk), file.name),
-                    file_type=str(file.content_type)
+                    file=media_storage.url(file_path),
+                    file_type=str(file_obj.content_type)
                 )
                 media.save()
 
                 count += 1
 
                 # media_saved signal creates user_post_media instance
-
                 media_saved.send(sender="create post", user=request.user.pk, post=post.pk, media=media.pk)
 
             except Exception as e:
                 post.delete()
+                media_storage.delete('post_media/post_3')
                 print("exception ", e)
-                return Response({"msg":"Some error occred."}, status=500)
+                return Response({"msg": "Some error occurred."}, status=500)
 
         serializer = PostSerializer(post)
         return Response(serializer.data)
@@ -280,7 +296,7 @@ def edit_post(request):
     "check if correct user is editing post"
     post_user_id = UserPostMedia.objects.filter(post_id=data['post_id'])[0].user.id
 
-    if post_user_id != request.user.id :
+    if post_user_id != request.user.id:
         return Response({'msg : Unauthorised '}, status=401)
 
     "check if channel list is empty"
@@ -303,7 +319,6 @@ def edit_post(request):
 
     if not post_channel_list.issubset(channel_member_list):
         return Response(status=400)
-
 
     postForm = PostForm(data)
 
@@ -328,44 +343,51 @@ def edit_post(request):
         for media in post_media:
             media.delete()
 
-        count = 0
+        # Storing Files in storage and path in db
 
-        try :
-            shutil.rmtree('/home/naman/Desktop/forum/Campus_Forum_Backend/media/postFiles/post_%s' % post.id)
+        count = UserPostMedia.objects.filter(post_id=post.id, media_id__isnull=False).count()
 
-        except FileNotFoundError:
-            print("No directory")
+        file_directory = 'post_media/post_%d' % post.id
+        media_storage = MediaStorage()
 
         for file in request.FILES:
-            file = request.FILES[file]
-            file_extension = file.name.split('.')[-1]
-            file.name = "media_%s.%s" % (count, file_extension)
+            file_obj = request.FILES[file]
+            file_extension = file_obj.name.split('.')[-1]
+
+            file_name = "media_%d.%s" % (
+                count,
+                file_extension
+            )
+
+            file_path = os.path.join(
+                file_directory,
+                file_name
+            )
 
             try:
-                default_storage.save("postFiles/post_%s/%s" % (str(post.pk), file.name), file)
-
+                media_storage.save(file_path, file_obj)
                 media = Media.objects.create(
-                    file="postFiles/post_%s/%s" % (str(post.pk), file.name),
-                    file_type=str(file.content_type)
+                    file=media_storage.url(file_path),
+                    file_type=str(file_obj.content_type)
                 )
                 media.save()
 
                 count += 1
 
                 # media_saved signal creates user_post_media instance
-
                 media_saved.send(sender="create post", user=request.user.pk, post=post.pk, media=media.pk)
 
             except Exception as e:
                 post.delete()
+                media_storage.delete('post_media/post_%d' % post.id)
                 print("exception ", e)
-                return Response({"msg":"Some error occred."}, status=500)
+                return Response({"msg": "Some error occurred."}, status=500)
 
         serializer = PostSerializer(post)
         return Response(serializer.data)
-
     else:
         return Response(status=400)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -373,13 +395,13 @@ def hide_post(request, post_id):
     "check if correct user is editing post"
     post = UserPostMedia.objects.filter(post_id=post_id)[0]
 
-    if post.user.id != request.user.id :
+    if post.user.id != request.user.id:
         return Response({'msg : Unauthorised '}, status=401)
 
     post.post.is_hidden = True
     post.post.save()
 
-    return Response({'msg':'msg'})
+    return Response({'msg': 'msg'})
 
 
 @api_view(['POST'])

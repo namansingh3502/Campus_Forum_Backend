@@ -1,6 +1,7 @@
+import os
+
 from coreapi.compat import force_text
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.files.storage import default_storage
 from django.http.response import HttpResponse
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
@@ -10,6 +11,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.core.mail import EmailMessage
+from Campus_Forum.custom_storage import MediaStorage
 
 from .serializers import *
 from .models import *
@@ -82,15 +84,33 @@ def user_profile(request, username):
 def update_user_image(request):
     user = UserProfile.objects.get(pk=request.user.pk)
 
+    # file directory in bucket
+    file_directory = 'profile_pic/{username}'.format(username=user)
+
     for file in request.FILES:
-        file = request.FILES[file]
-        file_extension = file.name.split('.')[-1]
-        file.name = str(user.username) + '.' + file_extension + "-" + str(uuid.uuid4())
+        file_obj = request.FILES[file]
+        file_extension = file_obj.name.split('.')[-1]
 
-        default_storage.delete("profile_pic/%s" % file.name)
-        default_storage.save("profile_pic/%s" % file.name, file)
+        file_name = "%s_%s.%s" % (
+            user.username,
+            uuid.uuid4(),
+            file_extension
+        )
 
-        user.user_image = "profile_pic/" + file.name
+        # full file path inside the bucket
+        # full path structure : profile_pic/<username>/<username>_<rand_value>.extension
+
+        file_path = os.path.join(
+            file_directory,
+            file_name
+        )
+
+        # save file in s3 bucket and url
+        media_storage = MediaStorage()
+
+        # update image url in db
+        media_storage.save(file_path, file_obj)
+        user.user_image = media_storage.url(file_path)
         user.save()
 
     serializer = UserProfileSerializer(user)
