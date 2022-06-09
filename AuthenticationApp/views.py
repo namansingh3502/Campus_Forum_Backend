@@ -1,7 +1,6 @@
 import os
 
 from coreapi.compat import force_text
-from django.contrib.sites.shortcuts import get_current_site
 from django.http.response import HttpResponse
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
@@ -39,11 +38,10 @@ def user_registration(request):
         user.is_active = False
         user.save()
 
-        current_site = get_current_site(request)
-        mail_subject = 'Activate your forum account.'
+        mail_subject = 'Account activation link.'
         message = render_to_string('acc_activate_email.html', {
             'user': user,
-            'domain': current_site.domain,
+            'domain': "https://college-forum.vercel.app/",
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             'token': account_activation_token.make_token(user),
         })
@@ -149,7 +147,7 @@ def email_reset_link(request):
         mail_subject = 'Password reset link.'
         message = render_to_string('reset_password_email.html', {
             'user': user,
-            'domain': '192.168.41.147',
+            'domain': 'https://college-forum.vercel.app',
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             'token': account_activation_token.make_token(user),
         })
