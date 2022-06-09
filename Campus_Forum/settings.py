@@ -22,13 +22,12 @@ print("running")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-#SECRET_KEY = os.environ['SECRET_KEY_DJANGO']
+# SECRET_KEY = os.environ['SECRET_KEY_DJANGO']
 SECRET_KEY = 'django-insecure-97g3h-p5h^a1y+y*@^6kmhw5sz-a^r9ms5r2ol7#cks5trthp&'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.41.147', 'http://192.168.41.147']
-
 
 # Application definition
 
@@ -47,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'corsheaders',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -83,17 +83,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Campus_Forum.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'forum_db',
+#         'USER': 'naman',
+#         'PASSWORD': 'Sarnath@2020',
+#         'HOST': 'localhost',
+#         'PORT': '5432'
+#     }
+# }
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'forum_db',
-        'USER': 'naman',
-        'PASSWORD': 'Sarnath@2020',
-        'HOST': 'localhost',
+        'USER': 'namansingh',
+        'PASSWORD': 'seoni2012',
+        'HOST': 'forumdb.cswhmdv2v9dv.ap-south-1.rds.amazonaws.com',
         'PORT': '5432'
     }
 }
@@ -104,7 +115,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = 'namans3502@gmail.com'
-EMAIL_HOST_PASSWORD = 'wspuzehewzrxotvb'
+EMAIL_HOST_PASSWORD = 'pefezdoualxcbyjr'
 
 DOMAIN = "localhost:8000"  # local: localhost:3000
 SITE_NAME = 'localhost'
@@ -198,7 +209,6 @@ LOGGING = {
     }
 }
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -212,12 +222,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+# STATIC_URL = 'static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -229,15 +238,30 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:1234",
     "http://127.0.0.1",
     "http://192.168.41.147",
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "https://forum-db.s3.amazonaws.com"
 ]
 
-#https://stackoverflow.com/questions/70285834/forbidden-403-csrf-verification-failed-request-aborted-reason-given-for-fail
+# https://stackoverflow.com/questions/70285834/forbidden-403-csrf-verification-failed-request-aborted-reason-given-for-fail
 
-CSRF_TRUSTED_ORIGINS = ['http://192.168.41.147']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:1234', 'http://127.0.0.1:8000']
 
-# Path tlo media root
-MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 AUTH_USER_MODEL = 'AuthenticationApp.UserProfile'
+
+# AWS S3 bucket config
+
+AWS_ACCESS_KEY_ID = 'AKIAWL7IKUUT2JQVYHUX'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'forum-db'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'static'
+
+STATIC_URL = 'https://%s/%s/static/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Path to media root
+DEFAULT_FILE_STORAGE = 'Campus_Forum.custom_storage.MediaStorage'

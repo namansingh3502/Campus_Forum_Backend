@@ -41,7 +41,7 @@ def user_registration(request):
         mail_subject = 'Account activation link.'
         message = render_to_string('acc_activate_email.html', {
             'user': user,
-            'domain': "https://college-forum.vercel.app/",
+            'domain': "https://college-forum.vercel.app",
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             'token': account_activation_token.make_token(user),
         })

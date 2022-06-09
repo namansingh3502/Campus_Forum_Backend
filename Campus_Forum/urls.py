@@ -20,9 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/auth/', include('AuthenticationApp.urls')),
-    path('api/forum/', include('Forum_App.urls'))
+    path('admin', admin.site.urls),
+    path('api/auth', include('AuthenticationApp.urls')),
+    path('api/forum', include('Forum_App.urls'))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
