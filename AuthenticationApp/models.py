@@ -48,7 +48,7 @@ class UserProfile(AbstractUser):
     )
     user_image = models.URLField(
         _("Profile Picture"),
-        default="default/user_image.jpeg"
+        default="https://forum-db.s3.ap-south-1.amazonaws.com/media/default.jpg"
     )
     cover_photo = models.URLField(
         _("Cover Photo"),
