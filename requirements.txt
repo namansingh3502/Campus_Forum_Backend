@@ -1,7 +1,10 @@
 django~=4.0
-
+djoser
 djangorestframework~=3.13.1
-
 Pyrebase~=3.0.27
 six~=1.16.0
 coreapi~=2.3.3
+django-cors-headers
+django-storages
+django-debug-toolbar
+boto3
