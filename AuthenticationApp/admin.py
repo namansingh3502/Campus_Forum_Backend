@@ -3,6 +3,12 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import *
 
+# Admin page settings
+
+admin.site.site_header = 'College Forum'
+admin.site.index_title = 'Features area'
+admin.site.site_title = 'HTML title from Administration'
+
 
 @admin.register(UserProfile)
 class UserProfileAdmin(UserAdmin):

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+from django.contrib import admin
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -64,7 +65,7 @@ ROOT_URLCONF = 'Campus_Forum.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -154,10 +155,7 @@ DEFAULT_FILE_STORAGE = 'Campus_Forum.custom_storage.MediaStorage'
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
-# STATIC_URL = 'https://%s/%s/static/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -243,26 +241,12 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ["*"] if DEBUG else os.environ.get("ALLOWED_HOST").split(",")
+ALLOWED_HOSTS = [] if DEBUG else os.environ.get("ALLOWED_HOST").split(",")
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:1234",
-    "http://127.0.0.1:1234",
-    "http://127.0.0.1",
-    "http://192.168.41.147",
-    "http://localhost:8000",
-    "https://forum-db.s3.amazonaws.com"
-]
+# CORS_ORIGIN_WHITELIST = []
 
 # https://stackoverflow.com/questions/70285834/forbidden-403-csrf-verification-failed-request-aborted-reason-given-for-fail
-CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:1234',
-    'http://127.0.0.1:8000',
-]
+# CSRF_TRUSTED_ORIGINS = []
 
 # Custom user auth model
 AUTH_USER_MODEL = 'AuthenticationApp.UserProfile'
-
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
